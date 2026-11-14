@@ -1,0 +1,4 @@
+.harness/
+.claude/
+__pycache__/
+site/
