@@ -320,10 +320,13 @@ details.catalog summary { cursor: pointer; font-weight: 600; font-size: 14px; co
 dialog { border: none; padding: 0; background: var(--sheet); color: var(--ink); border-radius: 14px; width: min(720px, calc(100vw - 24px)); max-height: min(92dvh, 940px); box-shadow: 0 28px 70px -24px rgba(0, 0, 0, .5); }
 dialog[open] { display: flex; flex-direction: column; }
 dialog::backdrop { background: var(--scrim); }
-dialog > form, dialog > .dlg-inner { display: flex; flex-direction: column; min-height: 0; flex: 1; }
+/* 入れ子の flex は iPhone の Safari で高さ0に潰れることがあるので、form を透過させて見出し・本文・ボタン行を直接並べる */
+dialog > form, dialog > .dlg-inner { display: contents; }
+.dlg-head, .dlg-foot { flex: 0 0 auto; }
+#editDlg[open] { height: min(92dvh, 940px); }
 .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--rule); }
 .dlg-head h2 { font-size: 17px; display: flex; align-items: center; gap: 10px; min-width: 0; }
-.dlg-body { padding: 16px 18px; overflow-y: auto; min-height: 0; flex: 1; display: grid; grid-auto-rows: max-content; gap: 14px; align-content: start; }
+.dlg-body { padding: 16px 18px; overflow-y: auto; min-height: 0; flex: 1 1 auto; display: grid; grid-auto-rows: max-content; gap: 14px; align-content: start; }
 .dlg-foot { display: flex; gap: 8px; align-items: center; padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--rule); flex-wrap: wrap; }
 .dlg-foot .spacer { flex: 1; }
 .picker { border: 1px solid var(--ai-line); border-radius: var(--r); padding: 12px; background: var(--ai-soft); display: grid; gap: 10px; }
@@ -434,6 +437,7 @@ dialog > form, dialog > .dlg-inner { display: flex; flex-direction: column; min-
   .form-grid { grid-template-columns: minmax(0, 1fr); }
   /* 下端に置くとキーボードやアプリの下部に隠れるので、見えている範囲の上寄せにする */
   dialog { width: calc(100vw - 16px); max-width: calc(100vw - 16px); inset: auto 0 auto 0; top: calc(var(--vvt, 0px) + env(safe-area-inset-top, 0px) + 8px); margin: 0 auto; max-height: calc(var(--vvh, 100dvh) - env(safe-area-inset-top, 0px) - 16px); border-radius: 14px; }
+  #editDlg[open] { height: calc(var(--vvh, 100dvh) - env(safe-area-inset-top, 0px) - 16px); }
   .dlg-foot { padding-bottom: 12px; }
   /* iPhone は 16px 未満の入力欄にフォーカスすると画面を拡大するため */
   .f input, .f select, .f textarea, .toolbar input, .toolbar select, .picker input[type="search"], .inline-field input[type="number"], .inline-field input[type="month"], .lock-card input { font-size: 16px; }
@@ -2305,6 +2309,14 @@ document.addEventListener('submit', async e => {
   if (document.body.contains(f)) { btn.disabled = false; btn.textContent = label; fail(m); }
   else toast(m, 'crit');
 });
+// 暗い背景をタップしたら閉じる（窓が何かの理由で見えなくても、画面が固まらないように）
+for (const d of document.querySelectorAll('dialog')) {
+  d.addEventListener('click', e => {
+    if (e.target !== d) return;
+    const r = d.getBoundingClientRect();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+  });
+}
 // スマホのキーボードが出たときも、ダイアログを見えている範囲に収める
 if (window.visualViewport) {
   const vv = window.visualViewport;

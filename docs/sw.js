@@ -1,5 +1,5 @@
 // サブスク通帳: オフラインでも開けるようにするための最小限のキャッシュ（新しい版を優先して取りに行く）
-const CACHE = 'subsc-tsucho-2026-11-14-72a0159a';
+const CACHE = 'subsc-tsucho-2026-11-14-656e8f99';
 const FILES = ['./', './index.html', './catalog.js', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); });
 self.addEventListener('activate', e => {
