@@ -1,8 +1,10 @@
-"""サブスク通帳: app/ の内容から、ふつうのブラウザ向けの公開用ファイルを site/ に作る。
+"""サブスク通帳: app/ の内容から、ふつうのブラウザ向けの公開用ファイルを docs/ に作る。
 
 使い方:  python build_site.py
   - app/index.html  … claude.ai と共通の本体（<html> や <head> を持たない形）
   - app/catalog.js  … 価格カタログ（毎月の更新はこのファイルだけ）
+  - app/config.js   … 公開用の設定（アプリのURL・Firebase の接続先）
+  - app/og.png      … リンクを共有したときに表示される画像（1200×630）
   - docs/           … GitHub Pages が公開するファイル一式（このスクリプトが毎回作り直す）
 """
 import json
@@ -69,19 +71,38 @@ def main():
     body = body.replace('<meta name="claude:viewport-fit-sides" content="cover">\n', '', 1)
 
     catalog = open(os.path.join(APP, 'catalog.js'), encoding='utf-8').read()
+    config = open(os.path.join(APP, 'config.js'), encoding='utf-8').read()
     version = (re.search(r'version:\s*"([^"]+)"', catalog) or [None, 'dev'])[1]
-    build = f'{version}-{zlib.crc32((src + catalog).encode()) & 0xffffffff:08x}'
+    build = f'{version}-{zlib.crc32((src + catalog + config).encode()) & 0xffffffff:08x}'
+    app_url = (re.search(r'appUrl:\s*"([^"]+)"', config) or [None, ''])[1]
+    desc = '大学生向けのサブスク管理。支払日カレンダー・学割・卒業後の料金の試算・みんなの人気ランキング。データはあなたのブラウザの中だけに保存します。'
+    og = [
+        '<meta property="og:type" content="website">',
+        f'<meta property="og:title" content="{title}">',
+        f'<meta property="og:description" content="{desc}">',
+        '<meta property="og:site_name" content="サブスク通帳">',
+        '<meta property="og:locale" content="ja_JP">',
+    ]
+    if app_url:
+        og += [
+            f'<meta property="og:url" content="{app_url}">',
+            f'<meta property="og:image" content="{app_url}og.png">',
+            '<meta property="og:image:width" content="1200">',
+            '<meta property="og:image:height" content="630">',
+        ]
+    og.append('<meta name="twitter:card" content="summary_large_image">')
+    og = '\n'.join(og) + '\n'
 
     head = f'''<!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://firestore.googleapis.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'">
 <meta name="referrer" content="no-referrer">
 <title>{title}</title>
-<meta name="description" content="大学生向けのサブスク管理。データはこのブラウザと、パスコードで暗号化した同期データにだけ保存します。">
-<meta name="theme-color" content="#17436b">
+<meta name="description" content="{desc}">
+{og}<meta name="theme-color" content="#17436b">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon-180.png">
@@ -99,6 +120,9 @@ def main():
 '''
     write('index.html', head + body + tail)
     write('catalog.js', catalog)
+    write('config.js', config)
+    if os.path.exists(os.path.join(APP, 'og.png')):
+        shutil.copyfile(os.path.join(APP, 'og.png'), os.path.join(OUT, 'og.png'))
     write('manifest.webmanifest', json.dumps({
         'name': 'サブスク通帳', 'short_name': 'サブスク通帳', 'lang': 'ja',
         'start_url': './', 'scope': './', 'display': 'standalone',
@@ -111,14 +135,14 @@ def main():
     }, ensure_ascii=False, indent=2))
     write('sw.js', f'''// サブスク通帳: オフラインでも開けるようにするための最小限のキャッシュ（新しい版を優先して取りに行く）
 const CACHE = 'subsc-tsucho-{build}';
-const FILES = ['./', './index.html', './catalog.js', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
+const FILES = ['./', './index.html', './config.js', './catalog.js', './manifest.webmanifest', './icon.svg', './icon-180.png', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', e => {{ e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES))); self.skipWaiting(); }});
 self.addEventListener('activate', e => {{
   e.waitUntil(caches.keys().then(keys => Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim()));
 }});
 self.addEventListener('fetch', e => {{
   const url = new URL(e.request.url);
-  if (e.request.method !== 'GET' || url.origin !== location.origin) return; // GitHub との通信には触れない
+  if (e.request.method !== 'GET' || url.origin !== location.origin) return; // Firebase との通信には触れない
   e.respondWith(fetch(e.request).then(res => {{
     const copy = res.clone();
     caches.open(CACHE).then(c => c.put(e.request, copy));

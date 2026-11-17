@@ -17,7 +17,7 @@
  *   - cat: video, music, books, study, software, ai, game, social, cloud, telecom, membership, life, delivery（定期便・宅配）, fitness（健康・美容・コンタクト）, other
  */
 window.SUBSCRIPTION_CATALOG = {
-  version: "2026-11-14",
+  version: "2026-11-17",
   fx: { USD: 158, asOf: "2026-10-30", note: "日銀為替市況 10月30日午後5時（157円55〜56銭、みんかぶ）を丸めた値" },
   services: [
     // ───────── 動画配信 ─────────
@@ -834,6 +834,71 @@ window.SUBSCRIPTION_CATALOG = {
       site: "https://www.trendmicro.com/ja_jp/forHome/products/vb.html",
       ref: "https://atsoho.com/apps/compare/nordvpn-vs-virusbuster-cloud",
       checked: "2026-11-14", confidence: "mid",
-      plans: [{ id: "auto-1y", name: "あんしん自動更新（1年）", price: 6490, c: "1y" }] }
+      plans: [{ id: "auto-1y", name: "あんしん自動更新（1年）", price: 6490, c: "1y" }] },
+
+    // ───────── 追加（2026-11-17）: 推し活・創作の支援 ─────────
+    { id: "pixiv", name: "pixivプレミアム", kana: "ぴくしぶ ぷれみあむ いらすと", cat: "social",
+      site: "https://www.pixiv.net/premium",
+      checked: "2026-11-17", confidence: "low", note: "Web決済の目安（比較サイトの情報）。アプリ内で払うと高くなることがある",
+      plans: [{ id: "monthly", name: "月額", price: 550, c: "1m" }] },
+    { id: "ytmembership", name: "YouTube メンバーシップ", kana: "ゆーちゅーぶ めんばーしっぷ めんしぷ めんげん 推し", cat: "video",
+      site: "https://www.youtube.com/paid_memberships", manage: "https://www.youtube.com/paid_memberships",
+      ref: "https://kai-you.net/article/95171",
+      checked: "2026-11-17", confidence: "low", note: "金額はチャンネルごとに違う（最安は140円）。登録したら実際の金額に直す",
+      plans: [{ id: "channel", name: "チャンネルメンバーシップ（最安の価格帯）", price: 140, c: "1m" }] },
+    { id: "fanbox", name: "pixivFANBOX", kana: "ぴくしぶ ふぁんぼっくす ふぁんぼ 支援", cat: "social",
+      site: "https://www.fanbox.cc/",
+      checked: "2026-11-17", confidence: "low", note: "金額はクリエイターが決める（目安の金額）。登録したら実際の金額に直す",
+      plans: [{ id: "support", name: "支援プラン（目安）", price: 500, c: "1m" }] },
+    { id: "fantia", name: "Fantia", kana: "ふぁんてぃあ ふぁんくらぶ 支援", cat: "social",
+      site: "https://fantia.jp/",
+      checked: "2026-11-17", confidence: "low", note: "金額はクリエイターが決める（目安の金額）。登録したら実際の金額に直す",
+      plans: [{ id: "support", name: "ファンクラブのプラン（目安）", price: 500, c: "1m" }] },
+
+    // ───────── 追加（2026-11-17）: ゲームの月パス・ミッションパス ─────────
+    { id: "pjsekai", name: "プロセカ（プロジェクトセカイ）", kana: "ぷろせか ぷろじぇくとせかい", cat: "game",
+      site: "https://pjsekai.sega.jp/",
+      ref: "https://game8.jp/pjsekai/663663",
+      checked: "2026-11-17", confidence: "mid", note: "毎月1日に切り替わるパス。アプリ内のショップで毎月購入",
+      plans: [
+        { id: "premium", name: "プレミアムミッションパス", price: 2000, c: "1m" },
+        { id: "set", name: "プレミアム＋マイセカイ ミッションパスのセット", price: 3500, c: "1m", note: "別々に買うと4,000円" }
+      ] },
+    { id: "umamusume", name: "ウマ娘 プリティーダービー", kana: "うまむすめ", cat: "game",
+      site: "https://umamusume.jp/",
+      ref: "https://game8.jp/umamusume/456096",
+      checked: "2026-11-17", confidence: "low", note: "期間ごとの購入。期間と内容は要確認",
+      plans: [{ id: "premium", name: "プレミアムパス", price: 800, c: "1m" }] },
+    { id: "bluearchive", name: "ブルーアーカイブ", kana: "ぶるーあーかいぶ ぶるあか", cat: "game",
+      site: "https://bluearchive.jp/",
+      ref: "https://game8.jp/blue-archive/634833",
+      checked: "2026-11-17", confidence: "low", note: "2025年時点の情報。マンスリーパッケージは購入から一定期間、毎日青輝石を受け取る",
+      plans: [{ id: "monthly", name: "マンスリーパッケージ", price: 320, c: "30d" }] },
+    { id: "endfield", name: "アークナイツ：エンドフィールド", kana: "あーくないつ えんどふぃーるど えんふぃ", cat: "game",
+      site: "https://endfield.gryphline.com/",
+      ref: "https://altema.jp/akendfield/kakin",
+      checked: "2026-11-17", confidence: "mid", note: "30日ごとの購入（自動更新ではない）",
+      plans: [{ id: "monthly", name: "月パス（30日）", price: 610, c: "30d" }] },
+    { id: "nikke", name: "勝利の女神：NIKKE", kana: "にけ しょうりのめがみ", cat: "game",
+      site: "https://nikke-jp.com/",
+      ref: "https://game8.jp/nikke/541806",
+      checked: "2026-11-17", confidence: "low", note: "月間パスは海外価格（4.99ドル）からの目安。日本の価格は要確認",
+      plans: [{ id: "monthly", name: "月間パス（30日）", price: 610, c: "30d" }] },
+
+    // ───────── 追加（2026-11-17）: 食事の定期便 ─────────
+    { id: "yoshikei", name: "ヨシケイ", kana: "よしけい みーるきっと 夕食", cat: "delivery",
+      site: "https://yoshikei-dvlp.co.jp/",
+      ref: "https://exidea.co.jp/blog/meal/home-meal/yoshikei/",
+      checked: "2026-11-17", confidence: "low", note: "メニューと人数で金額が変わる。週ごとの注文で、休む週も選べる",
+      plans: [{ id: "5d-2p", name: "5日分・2人前（目安）", price: 7230, c: "1w" }] },
+    { id: "mitsuboshi", name: "三ツ星ファーム", kana: "みつぼしふぁーむ たくしょく", cat: "delivery",
+      site: "https://mitsuboshifarm.jp/",
+      ref: "https://exidea.co.jp/blog/meal/home-meal/mitsuboshifarm-price",
+      checked: "2026-11-17", confidence: "mid", note: "1回あたりの価格。送料990円（北海道・沖縄は2,500円）は別。配送の間隔は選べる",
+      plans: [
+        { id: "7", name: "7食コース", price: 6485, c: "2w" },
+        { id: "14", name: "14食コース", price: 11458, c: "1m" },
+        { id: "21", name: "21食コース", price: 14918, c: "1m" }
+      ] }
   ]
 };

@@ -3,10 +3,20 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://api.github.com https://gist.githubusercontent.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; connect-src 'self' https://firestore.googleapis.com; manifest-src 'self'; worker-src 'self'; base-uri 'none'">
 <meta name="referrer" content="no-referrer">
 <title>サブスク通帳</title>
-<meta name="description" content="大学生向けのサブスク管理。データはこのブラウザと、パスコードで暗号化した同期データにだけ保存します。">
+<meta name="description" content="大学生向けのサブスク管理。支払日カレンダー・学割・卒業後の料金の試算・みんなの人気ランキング。データはあなたのブラウザの中だけに保存します。">
+<meta property="og:type" content="website">
+<meta property="og:title" content="サブスク通帳">
+<meta property="og:description" content="大学生向けのサブスク管理。支払日カレンダー・学割・卒業後の料金の試算・みんなの人気ランキング。データはあなたのブラウザの中だけに保存します。">
+<meta property="og:site_name" content="サブスク通帳">
+<meta property="og:locale" content="ja_JP">
+<meta property="og:url" content="https://jinbb-shark.github.io/subsc-tsucho/">
+<meta property="og:image" content="https://jinbb-shark.github.io/subsc-tsucho/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#17436b">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -97,7 +107,6 @@ h2 { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
 .cat-software { --c: var(--c-software); } .cat-ai { --c: var(--c-ai); } .cat-game { --c: var(--c-game); } .cat-social { --c: var(--c-social); }
 .cat-cloud { --c: var(--c-cloud); } .cat-telecom { --c: var(--c-telecom); } .cat-membership { --c: var(--c-membership); } .cat-life { --c: var(--c-life); }
 .cat-fitness { --c: var(--c-fitness); } .cat-other { --c: var(--c-other); } .cat-delivery { --c: var(--c-delivery); }
-.sync-steps code { font-family: var(--f-num); font-size: 12px; background: var(--rule); padding: 0 4px; border-radius: 4px; }
 .mono-badge { width: 34px; height: 34px; flex: none; border-radius: 9px; display: grid; place-items: center; font-weight: 800; font-size: 15px; background: color-mix(in srgb, var(--c) 16%, var(--sheet)); color: color-mix(in srgb, var(--c) 72%, var(--ink)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 28%, transparent); }
 .mono-badge.sm { width: 26px; height: 26px; border-radius: 7px; font-size: 12.5px; }
 
@@ -315,9 +324,28 @@ main { padding-block: 18px calc(48px + var(--nav-h)); }
 .status-line.on { color: var(--good); }
 .status-line.warn { color: var(--warn); }
 .status-line.crit { color: var(--crit); }
-.sync-card { border-color: var(--ai-line); }
-.sync-steps { margin: 8px 0 0; padding-left: 1.3em; font-size: 13px; color: var(--ink-2); }
-.sync-steps li { margin: 2px 0; }
+#transferCard { scroll-margin-top: 130px; }
+.transfer-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px 24px; margin-top: 12px; }
+.sub-h { font-size: 13.5px; font-weight: 700; margin: 0 0 6px; color: var(--ink-2); letter-spacing: .03em; }
+.code-box { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 2px 0 6px; }
+.code-box .code { font-family: var(--f-num); font-size: 25px; font-weight: 800; letter-spacing: .12em; padding: 6px 14px; border-radius: 10px; background: var(--ai-soft); color: var(--ai); border: 1px dashed var(--ai-line); user-select: all; -webkit-user-select: all; }
+details.manual { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--rule); }
+details.manual .textdump { min-height: 84px; margin-top: 10px; }
+.privacy-list ul { margin: 4px 0 0; padding-left: 1.2em; }
+.pop-list { list-style: none; margin: 0; padding: 0; display: grid; }
+.pop-row { display: grid; grid-template-columns: 20px auto minmax(0, 1fr) auto 34px; gap: 4px 10px; align-items: center; padding: 7px 0; border-top: 1px solid var(--rule); }
+.pop-row:first-child { border-top: none; }
+.pop-rank { font-family: var(--f-num); font-weight: 800; font-size: 13px; color: var(--ink-3); text-align: center; }
+.pop-row:nth-child(-n+3) .pop-rank { color: var(--warn); }
+.pop-name { font-weight: 700; font-size: 13.5px; min-width: 0; display: grid; gap: 4px; }
+.pop-name > span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pop-bar { height: 4px; border-radius: 2px; background: var(--rule); overflow: hidden; }
+.pop-bar i { display: block; height: 100%; background: var(--c, var(--ai)); border-radius: 2px; }
+.pop-n { font-size: 12.5px; color: var(--ink-2); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pop-row .btn { min-width: 32px; padding-left: 0; padding-right: 0; justify-content: center; }
+.pop-list .empty-note { padding: 6px 0; }
+.badge.hot { background: var(--warn-soft); color: var(--warn); margin-left: 0; }
+.badge.comm { background: var(--ai-soft); color: var(--ai); margin-left: 0; }
 .inline-pass { display: flex; gap: 8px 10px; align-items: end; flex-wrap: wrap; margin-top: 12px; }
 .inline-pass .f { flex: 1 1 200px; }
 .inline-pass .err { flex-basis: 100%; margin: 0; }
@@ -336,6 +364,7 @@ details.catalog summary { cursor: pointer; font-weight: 600; font-size: 14px; co
 /* ── ダイアログ ── */
 dialog { border: none; padding: 0; background: var(--sheet); color: var(--ink); border-radius: 14px; width: min(720px, calc(100vw - 24px)); max-height: min(92dvh, 940px); box-shadow: 0 28px 70px -24px rgba(0, 0, 0, .5); }
 dialog[open] { display: flex; flex-direction: column; }
+dialog { overscroll-behavior: contain; }
 dialog::backdrop { background: var(--scrim); }
 /* 入れ子の flex は iPhone の Safari で高さ0に潰れることがあるので、form を透過させて見出し・本文・ボタン行を直接並べる */
 dialog > form, dialog > .dlg-inner { display: contents; }
@@ -343,7 +372,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 #editDlg[open] { height: min(92dvh, 940px); }
 .dlg-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-bottom: 1px solid var(--rule); }
 .dlg-head h2 { font-size: 17px; display: flex; align-items: center; gap: 10px; min-width: 0; }
-.dlg-body { padding: 16px 18px; overflow-y: auto; min-height: 0; flex: 1 1 auto; display: grid; grid-auto-rows: max-content; gap: 14px; align-content: start; }
+.dlg-body { padding: 16px 18px; overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch; min-height: 0; flex: 1 1 auto; display: grid; grid-auto-rows: max-content; gap: 14px; align-content: start; }
 .dlg-foot { display: flex; gap: 8px; align-items: center; padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--rule); flex-wrap: wrap; }
 .dlg-foot .spacer { flex: 1; }
 .picker { border: 1px solid var(--ai-line); border-radius: var(--r); padding: 12px; background: var(--ai-soft); display: grid; gap: 10px; }
@@ -352,7 +381,8 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { border: 1px solid var(--rule-2); background: var(--sheet); border-radius: 999px; padding: 3px 11px; font-size: 12.5px; cursor: pointer; }
 .chip[aria-pressed="true"] { background: var(--ai); color: var(--ai-ink); border-color: var(--ai); }
-.svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; max-height: 260px; overflow-y: auto; padding: 2px; }
+.svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; padding: 2px; }
+.svc.more { justify-content: center; font-size: 13px; font-weight: 700; color: var(--ai); grid-column: 1 / -1; }
 .svc { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 9px; text-align: left; cursor: pointer; display: flex; gap: 8px; align-items: center; min-width: 0; }
 .svc:hover { border-color: var(--ai); }
 .svc[aria-pressed="true"] { border-color: var(--ai); box-shadow: inset 0 0 0 1px var(--ai); }
@@ -494,7 +524,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
       <button class="tab" role="tab" id="tab-overview" data-tab="overview" aria-controls="view-overview">概要</button>
       <button class="tab" role="tab" id="tab-list" data-tab="list" aria-controls="view-list">一覧</button>
       <button class="tab" role="tab" id="tab-calendar" data-tab="calendar" aria-controls="view-calendar">カレンダー</button>
-      <button class="tab" role="tab" id="tab-settings" data-tab="settings" aria-controls="view-settings">設定・同期</button>
+      <button class="tab" role="tab" id="tab-settings" data-tab="settings" aria-controls="view-settings">設定</button>
     </nav>
   </div>
 </header>
@@ -503,18 +533,6 @@ dialog > form, dialog > .dlg-inner { display: contents; }
   <div class="wrap">
     <span><strong>サンプルを表示中です。</strong>最初のサブスクを追加すると、サンプルは自動で消えます。</span>
     <button class="btn sm" data-action="clear-sample">サンプルを消す</button>
-  </div>
-</div>
-<div class="banner" id="joinBanner" hidden>
-  <div class="wrap">
-    <span><strong>ほかの端末の同期データがあります。</strong>同じパスコードを入力すると、この端末にも表示されます。</span>
-    <button class="btn sm primary" data-action="join-sync">パスコードを入力して同期</button>
-  </div>
-</div>
-<div class="banner" id="repassBanner" hidden>
-  <div class="wrap">
-    <span><strong>同期のパスコードが変更されました。</strong>新しいパスコードを入力するまで、この端末の同期は止まっています。</span>
-    <button class="btn sm primary" data-action="repass">新しいパスコードを入力</button>
   </div>
 </div>
 
@@ -542,6 +560,11 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         <div class="card">
           <div class="card-head"><h2>カテゴリ別（ひと月あたり）</h2><span class="muted small">契約中のみ・自己負担額</span></div>
           <div class="bars" id="catBars"></div>
+        </div>
+        <div class="card needs-online" id="popCard">
+          <div class="card-head"><h2>みんなの人気</h2><span class="muted small">このアプリで追加した人の数</span></div>
+          <ol class="pop-list" id="popList"></ol>
+          <div class="btn-row"><button class="btn sm" data-action="open-community">みんなが追加したサブスクを見る</button></div>
         </div>
       </div>
     </div>
@@ -585,10 +608,31 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 
   <section id="view-settings" role="tabpanel" aria-labelledby="tab-settings" hidden>
     <div class="set-grid">
-      <div class="card wide sync-card">
-        <div class="card-head" style="margin-bottom:4px"><h2>スマホとPCで同期</h2><span id="syncState"></span></div>
-        <p id="syncIntro"></p>
-        <div id="syncBody"></div>
+      <div class="card wide" id="transferCard">
+        <h2>ほかのブラウザ・機種に引き継ぐ</h2>
+        <p>データはブラウザごとに別々に保存されます。<b>iPhone では、Safari と「ホーム画面に追加」したアプリも別々</b>なので、ホーム画面から開くと最初の状態に見えます。ここで、いまのデータを移せます。</p>
+        <div class="transfer-grid needs-online">
+          <div>
+            <h3 class="sub-h">① 移す前の画面で（例: Safari）</h3>
+            <div id="transferSend"></div>
+          </div>
+          <div>
+            <h3 class="sub-h">② 移した先の画面で（例: ホーム画面のアプリ）</h3>
+            <form class="inline-pass" id="transferForm" novalidate style="margin-top:0">
+              <label class="f"><span>引き継ぎコード（10文字）</span><input name="code" autocomplete="off" autocapitalize="characters" autocorrect="off" spellcheck="false" enterkeyhint="go" maxlength="16" placeholder="ABCDE-FGH23"></label>
+              <button class="btn primary" type="submit">引き継ぐ</button>
+              <p class="err" role="alert" hidden></p>
+            </form>
+            <p class="small muted">この画面にあるデータは消えず、引き継いだ分と合わせて残ります。パスコードは引き継がれないので、必要ならこの画面で設定し直してください。</p>
+          </div>
+        </div>
+        <details class="catalog manual" id="manualTransfer">
+          <summary>通信を使わずに移す（コピー＆貼り付け）</summary>
+          <p class="small" style="margin:8px 0 0">同じスマホの中なら、コピー＆貼り付けでも移せます。① 移す前の画面で「データをコピー」→ ② 移した先の画面でこの欄に貼り付けて「読み込む」。</p>
+          <div class="btn-row"><button class="btn" data-action="copy-data">データをコピー</button></div>
+          <textarea class="textdump" id="pasteBox" rows="3" placeholder="ここに貼り付け" autocomplete="off" spellcheck="false"></textarea>
+          <div class="btn-row"><button class="btn" data-action="paste-import">貼り付けたデータを読み込む</button></div>
+        </details>
       </div>
       <div class="card">
         <h2>学生の設定</h2>
@@ -598,7 +642,13 @@ dialog > form, dialog > .dlg-inner { display: contents; }
       </div>
       <div class="card">
         <h2>パスコード</h2>
-        <p>設定すると、この端末に保存するデータも AES-256 で暗号化します。同期にも同じパスコードを使います。</p>
+        <p>この端末に保存するデータに鍵をかけます。設定しなくても使えます。</p>
+        <ul class="privacy-list">
+          <li><b>守れるもの</b>：このブラウザに保存したサブスクの一覧と設定。パスコードから作った鍵で暗号化（AES-256）するので、スマホを人に貸したときなどに中身を見られません。</li>
+          <li><b>開くたびに求める</b>：オンにすると、アプリを開くたびに入力します。オフなら、この端末では入力を省けます。</li>
+          <li><b>忘れたら元に戻せません</b>：パスコードはどこにも送らず、アプリの作者も知らないため、再発行できません。設定する前にバックアップを書き出しておくと安心です。</li>
+          <li>書き出したバックアップも同じパスコードで暗号化されます（引き継ぎコードとは別のものです）。</li>
+        </ul>
         <div id="lockStatus"></div>
         <div id="lockOptions"></div>
         <div class="btn-row" id="lockButtons"></div>
@@ -625,11 +675,30 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         </div>
         <p class="small muted">カレンダー用ファイルは、支払日の前日に通知が出る予定を作ります。Googleカレンダーや iPhone のカレンダーに読み込めます（ZIP で保存された場合は展開してから）。</p>
       </div>
+      <div class="card needs-online">
+        <h2>みんなのサブスク・人気ランキング</h2>
+        <p>このアプリを使っている人の間でよく使われているサブスクを、「概要」と追加画面に表示します。</p>
+        <label class="switch"><input type="checkbox" id="sRank"> 人気ランキングに参加する</label>
+        <p class="small muted">参加すると、サブスクを追加したときに<b>どのサービスか</b>だけを匿名で1つ数えます（同じサービスは1回だけ）。金額・支払日・メモなど、ほかの情報は送りません。</p>
+        <p class="small muted" id="onlineInfo"></p>
+      </div>
+      <div class="card">
+        <h2>友だちにすすめる</h2>
+        <p>このアプリのリンクを送れます。データはそれぞれのブラウザに保存されるので、あなたの登録内容が友だちに見えることはありません。</p>
+        <div class="btn-row"><button class="btn primary" data-action="share-app">リンクを送る</button></div>
+      </div>
       <div class="card wide">
         <h2>プライバシー</h2>
         <ul class="privacy-list">
-          <li>登録した内容は、いま使っているブラウザの中に保存されます。</li>
-          <li>同期をオンにしたときだけ、暗号化したデータを上の保存場所に送ります。それ以外にはどこにも送信しません。</li>
+          <li>登録した内容（名前・金額・支払日・支払い方法・メモ）は、いま使っているブラウザの中にだけ保存されます。アカウント登録はありません。</li>
+          <li class="no-online">ほかの場所には何も送信しません。</li>
+          <li class="needs-online">外に送るのは次の3つだけです。送り先は Google の Firebase で、アカウントやメールアドレスは使わないため、誰が送ったかはデータに残りません。
+            <ul>
+              <li>人気ランキングに参加しているとき：追加したサービスの種類（例: Netflix）を1つ数える情報</li>
+              <li>「みんなのサブスクに公開」を選んで保存したとき：そのサブスクの名前・カテゴリ・金額・支払い周期</li>
+              <li>引き継ぎコードを発行したとき：コードで暗号化したデータ（24時間で期限切れ。受け取ると消えます）</li>
+            </ul>
+          </li>
           <li>カード番号・パスワードなどを入力する欄はありません。支払い方法は「楽天カード」のような呼び名だけで十分です。</li>
           <li>フォントや画像も外部から読み込みません。</li>
         </ul>
@@ -644,7 +713,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
       </div>
       <div class="card wide">
         <h2>データの削除</h2>
-        <p>このブラウザに保存したサブスクと設定をすべて消します。同期中の場合は、この端末の同期を止めてから消します（同期の保存場所のデータは残ります）。</p>
+        <p>このブラウザに保存したサブスクと設定をすべて消します。元に戻せないので、必要なら先にバックアップを書き出してください。</p>
         <div class="btn-row"><button class="btn danger-ghost" data-action="clear-all">このブラウザのデータを削除</button></div>
       </div>
     </div>
@@ -656,7 +725,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
   <button class="bn" data-tab="list" aria-label="一覧"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h11M9 12h11M9 18h11"/><circle cx="4.5" cy="6" r="1"/><circle cx="4.5" cy="12" r="1"/><circle cx="4.5" cy="18" r="1"/></svg>一覧</button>
   <button class="bn-add" data-action="add" aria-label="サブスクを追加"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
   <button class="bn" data-tab="calendar" aria-label="カレンダー"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>カレンダー</button>
-  <button class="bn" data-tab="settings" aria-label="設定・同期"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>設定</button>
+  <button class="bn" data-tab="settings" aria-label="設定"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></svg>設定</button>
 </nav>
 
 <dialog id="editDlg" aria-labelledby="editTitle">
@@ -691,6 +760,10 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         <label class="f"><span>支払い方法</span><input id="fMethod" maxlength="80" list="methodList" placeholder="例: キャリア決済 / PayPay" autocomplete="off"><small>呼び名だけ。カード番号は入力しないでください</small></label>
         <label class="f"><span>分担する人数</span><input id="fShare" type="number" min="1" max="20" step="1" inputmode="numeric"><small>家族や友だちと割り勘なら人数（自分を含む）。自己負担額で集計します</small></label>
         <label class="f f-wide"><span>メモ</span><textarea id="fNote" rows="2" maxlength="1000" placeholder="例: 解約はアプリからできない。ブラウザで手続き"></textarea></label>
+        <div class="f f-wide" id="publishWrap" hidden>
+          <label class="switch" style="margin:0"><input type="checkbox" id="fPublish"> 「みんなのサブスク」に公開する</label>
+          <small>一覧にないサービスを、ほかの人も選べるようにします。公開するのは名前・カテゴリ・金額・支払い周期だけで、支払日・支払い方法・メモは公開しません。</small>
+        </div>
       </fieldset>
       <datalist id="methodList">
         <option value="クレジットカード"></option><option value="デビットカード"></option><option value="キャリア決済"></option>
@@ -727,7 +800,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
   <div class="dlg-inner">
     <div class="dlg-head"><h2 id="textTitle">内容をコピーして保存</h2><button type="button" class="icon-btn plain" id="textClose" aria-label="閉じる">✕</button></div>
     <div class="dlg-body">
-      <p style="margin:0;font-size:13.5px;color:var(--ink-2)">この画面ではファイルを直接保存できませんでした。下の内容をコピーして、メモ帳などに貼り付けて「<span id="textName"></span>」という名前で保存してください。</p>
+      <p id="textDesc" style="margin:0;font-size:13.5px;color:var(--ink-2)"></p>
       <textarea class="textdump" id="textDump" readonly></textarea>
     </div>
     <div class="dlg-foot"><span class="spacer"></span><button type="button" class="btn primary" id="textCopy">コピー</button></div>
@@ -737,13 +810,13 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 <div class="lock" id="lockScreen" hidden>
   <form class="lock-card" id="lockForm">
     <div class="brand"><span class="seal" aria-hidden="true">通</span><h1>サブスク通帳</h1></div>
-    <p style="margin:0;color:var(--ink-2);font-size:14px">データはパスコードで暗号化されています。</p>
+    <p style="margin:0;color:var(--ink-2);font-size:14px">この端末のデータには、パスコードで鍵がかかっています。</p>
     <label class="f"><span>パスコード</span><input id="lockPass" type="password" autocomplete="current-password" required></label>
     <div class="err" id="lockErr" role="alert" hidden></div>
     <button class="btn primary" type="submit" id="lockSubmit">開く</button>
     <button class="btn link" type="button" id="lockForgot" style="justify-self:start;font-size:13px">パスコードを忘れた場合</button>
     <div id="lockForgotBox" hidden>
-      <p style="margin:0 0 8px;font-size:13px;color:var(--ink-2)">パスコードがないとデータは復元できません。バックアップか同期データがあれば、消去したあとに読み込めます。</p>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--ink-2)">パスコードはどこにも保存されていないため、再発行できません。バックアップファイルがあれば、消去したあとに読み込めます。</p>
       <button class="btn danger" type="button" id="lockWipe">この端末のデータを消去して最初から</button>
     </div>
   </form>
@@ -751,6 +824,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 
 <div class="toast" id="toast" role="status" aria-live="polite" hidden></div>
 
+<script src="config.js"></script>
 <script src="catalog.js"></script>
 <script>
 (() => {
@@ -798,7 +872,6 @@ const svg = (d, cls = '') => `<svg${cls ? ` class="${cls}"` : ''} viewBox="0 0 2
 const ICON = {
   lock: svg('<rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>'),
   device: svg('<rect x="3" y="4" width="18" height="12" rx="1.5"/><path d="M8 20h8M12 16v4"/>'),
-  sync: svg('<path d="M20 11a8 8 0 0 0-14.3-4.9L4 8M4 4v4h4M4 13a8 8 0 0 0 14.3 4.9L20 16M20 20v-4h-4"/>'),
   eye: svg('<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>'),
   eyeOff: svg('<path d="M3 3l18 18M10.6 5.1A10.8 10.8 0 0 1 12 5c6.4 0 10 7 10 7a17 17 0 0 1-3.2 4.1M6.6 6.6C3.7 8.4 2 12 2 12s3.6 7 10 7a10 10 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2"/>'),
   crit: svg('<circle cx="12" cy="12" r="9"/><path d="M12 7v6M12 16.5v.5"/>', 'ico'),
@@ -842,10 +915,17 @@ function initial(name) { const ch = [...String(name || '?').trim()][0] || '?'; r
 const finePointer = () => { try { return matchMedia('(pointer: fine)').matches; } catch { return true; } };
 const mono = (name, cat, sm = false) => `<span class="mono-badge${sm ? ' sm' : ''} cat-${esc(cat)}" aria-hidden="true">${esc(initial(name))}</span>`;
 
-/* ───────── 端末ごとの設定（同期しない） ───────── */
+/* ───────── 端末ごとの設定（引き継がない） ───────── */
 const device = (() => {
-  const base = { hideAmounts: false, sync: false, lockOnOpen: null, gistToken: '', gistId: '' };
-  try { return Object.assign(base, JSON.parse(localStorage.getItem(DEVICE_KEY) || '{}')); } catch { return base; }
+  const base = { hideAmounts: false, lockOnOpen: null };
+  let d = base;
+  try { d = Object.assign(base, JSON.parse(localStorage.getItem(DEVICE_KEY) || '{}')); } catch {}
+  // 以前の同期機能の設定（GitHub のトークンなど）は使わなくなったので、端末から消しておく
+  if ('sync' in d || 'gistToken' in d || 'gistId' in d) {
+    delete d.sync; delete d.gistToken; delete d.gistId;
+    try { localStorage.setItem(DEVICE_KEY, JSON.stringify(d)); } catch {}
+  }
+  return d;
 })();
 function saveDevice() { try { localStorage.setItem(DEVICE_KEY, JSON.stringify(device)); } catch {} }
 
@@ -853,12 +933,11 @@ function saveDevice() { try { localStorage.setItem(DEVICE_KEY, JSON.stringify(de
 let state = null;           // { v, subs, tomb, settings }
 let session = null;         // パスコード有効時 { key, salt, iter }
 let pendingEnc = null;      // ロック中の暗号化データ
-const ui = { tab: 'overview', cal: null, editId: null, editRef: null, usage: '', pick: { cat: 'all', q: '', svc: null }, delArmed: false };
+const ui = { tab: 'overview', cal: null, editId: null, editRef: null, editCid: '', usage: '', pick: { cat: 'all', q: '', svc: null, more: false }, delArmed: false };
 
 function defaultSettings() {
-  return { budget: 0, sampleBudget: false, fxUSD: null, lastBackup: '', seenCatalog: '', student: true, gradMonth: '', dismissed: {}, updatedAt: 0 };
+  return { budget: 0, sampleBudget: false, fxUSD: null, lastBackup: '', seenCatalog: '', student: true, gradMonth: '', dismissed: {}, rank: true, ranked: [], updatedAt: 0 };
 }
-const SUB_FIELDS = ['id', 'name', 'plan', 'cat', 'price', 'cur', 'cycle', 'anchor', 'method', 'status', 'trialEnd', 'usage', 'share', 'note', 'ref', 'ignoredPrice', 'cancelledAt', 'createdAt', 'updatedAt'];
 function normSub(x) {
   if (!x || typeof x !== 'object') return null;
   const str = (v, max) => typeof v === 'string' ? v.slice(0, max) : '';
@@ -879,6 +958,7 @@ function normSub(x) {
     ignoredPrice: typeof x.ignoredPrice === 'number' ? x.ignoredPrice : null,
     cancelledAt: isISO(x.cancelledAt) ? x.cancelledAt : '',
     createdAt: str(x.createdAt, 30), updatedAt: Number(x.updatedAt) > 0 ? Number(x.updatedAt) : 0,
+    cid: typeof x.cid === 'string' && /^[A-Za-z0-9]{1,40}$/.test(x.cid) ? x.cid : '',
     sample: x.sample === true
   };
 }
@@ -892,6 +972,8 @@ function normalize(d) {
   s.seenCatalog = typeof inS.seenCatalog === 'string' ? inS.seenCatalog.slice(0, 20) : '';
   s.student = inS.student !== false;
   s.gradMonth = isYM(inS.gradMonth) ? inS.gradMonth : '';
+  s.rank = inS.rank !== false;
+  if (Array.isArray(inS.ranked)) s.ranked = inS.ranked.filter(x => typeof x === 'string').slice(-500).map(x => x.slice(0, 60));
   if (inS.dismissed && typeof inS.dismissed === 'object') for (const k of Object.keys(inS.dismissed).slice(0, 500)) s.dismissed[k.slice(0, 120)] = true;
   s.updatedAt = Number(inS.updatedAt) > 0 ? Number(inS.updatedAt) : 0;
   if (!s.seenCatalog) s.seenCatalog = CATALOG.version || '';
@@ -1001,7 +1083,7 @@ function queueSave() {
   }).catch(() => toast('保存に失敗しました', 'crit'));
   return saveChain;
 }
-function commit(fn) { fn(); queueSave(); schedulePush(); render(); }
+function commit(fn) { fn(); queueSave(); render(); }
 const touch = s => { s.updatedAt = now(); s.sample = false; };
 const touchSettings = () => { state.settings.updatedAt = now(); };
 function clearSamples() {
@@ -1009,18 +1091,7 @@ function clearSamples() {
   if (state.settings.sampleBudget) { state.settings.budget = 0; state.settings.sampleBudget = false; state.settings.gradMonth = ''; }
 }
 
-/* ───────── 同期（暗号化したまま claude.ai の個人用保存場所へ） ───────── */
-const sync = { ref: null, avail: 'checking', status: 'off', unsub: null, remoteExists: false, hadRemote: false, lastCt: '', remoteJSON: '', lastAt: 0, pushing: false, again: false, err: '', pending: null };
-const syncOn = () => !!(device.sync && sync.ref && session);
-function syncPart(st) { return { v: 2, subs: st.subs.filter(s => !s.sample), tomb: st.tomb, settings: st.settings }; }
-function canon(p) {
-  const st = p.settings;
-  return JSON.stringify([
-    [...p.subs].sort((a, b) => a.id < b.id ? -1 : 1).map(s => SUB_FIELDS.map(k => s[k] ?? null)),
-    Object.keys(p.tomb).sort().map(k => [k, p.tomb[k]]),
-    [st.budget, st.sampleBudget, st.fxUSD, st.lastBackup, st.seenCatalog, st.student, st.gradMonth, Object.keys(st.dismissed).sort(), st.updatedAt]
-  ]);
-}
+/* ───────── 2つのデータを合わせる（引き継ぎ・貼り付けで使う） ───────── */
 function mergeStates(a, b) {
   const tomb = Object.assign({}, a.tomb);
   for (const [k, v] of Object.entries(b.tomb || {})) tomb[k] = Math.max(tomb[k] || 0, v);
@@ -1033,249 +1104,173 @@ function mergeStates(a, b) {
   }
   const subs = [...byId.values()].filter(s => !(tomb[s.id] >= (s.updatedAt || 0))).map(s => normSub(s));
   const settings = JSON.parse(JSON.stringify((b.settings.updatedAt || 0) > (a.settings.updatedAt || 0) ? b.settings : a.settings));
+  settings.ranked = [...new Set([...(a.settings.ranked || []), ...(b.settings.ranked || [])])].slice(-500);
   return { v: 2, subs, tomb, settings };
 }
-/* ふつうのブラウザで開いたときは、GitHub の非公開 Gist を同期の保存場所にする。
-   置くのは暗号文だけ。トークンはこの端末の localStorage に保存する。 */
-const IN_CLAUDE = !!(window.claude && typeof window.claude.use === 'function');
-const GIST_API = window.SUBSC_GIST_API || 'https://api.github.com';
-const GIST_FILE = 'subsc-tsucho-vault.json';
-const syncErr = code => Object.assign(new Error(code), { code });
-function gistBackend(token, knownId) {
-  let id = knownId || '', etag = '', cache = null;
-  const auth = { Authorization: 'Bearer ' + token, Accept: 'application/vnd.github+json' };
-  const call = async (method, path, body, extra) => {
-    let r;
-    try {
-      r = await fetch(GIST_API + path, { method, cache: 'no-store', headers: Object.assign({}, auth, body ? { 'Content-Type': 'application/json' } : {}, extra || {}), body: body ? JSON.stringify(body) : undefined });
-    } catch { throw syncErr('unavailable'); }
-    if (r.status === 401 || r.status === 403) throw syncErr('unauthorized');
-    return r;
-  };
-  const remember = v => { id = v || ''; if (device.gistId !== id) { device.gistId = id; saveDevice(); } };
-  async function find() {
-    for (let page = 1; page <= 10; page++) {
-      const r = await call('GET', `/gists?per_page=100&page=${page}`);
-      if (!r.ok) throw syncErr('unavailable');
-      const list = await r.json();
-      const g = list.find(x => x.files && x.files[GIST_FILE]);
-      if (g) return g.id;
-      if (list.length < 100) return '';
-    }
-    return '';
-  }
-  async function read() {
-    if (!id) { remember(await find()); etag = ''; cache = null; }
-    if (!id) return null;
-    const r = await call('GET', '/gists/' + id, null, etag ? { 'If-None-Match': etag } : null);
-    if (r.status === 304) return cache;
-    if (r.status === 404) { remember(''); etag = ''; cache = null; return null; }
-    if (!r.ok) throw syncErr('unavailable');
-    etag = r.headers.get('ETag') || '';
-    const g = await r.json(), f = g.files && g.files[GIST_FILE];
-    if (!f) { cache = null; return null; }
-    let text = f.content;
-    if (f.truncated && f.raw_url) { try { text = await (await fetch(f.raw_url, { cache: 'no-store' })).text(); } catch { throw syncErr('unavailable'); } }
-    try { cache = JSON.parse(text); } catch { cache = null; }
-    return cache;
-  }
-  const snapOf = d => ({ exists: !!d, data: () => d || undefined, metadata: { fromCache: false, hasPendingWrites: false } });
-  const be = {
-    kind: 'gist',
-    async check() {
-      const r = await call('GET', '/gists?per_page=1');
-      if (!r.ok) throw syncErr('unavailable');
-      const scopes = r.headers.get('X-OAuth-Scopes');
-      if (scopes !== null && scopes !== '' && !scopes.split(',').map(s => s.trim()).includes('gist')) throw syncErr('noscope');
-    },
-    async get() { return snapOf(await read()); },
-    async set(data) {
-      const files = { [GIST_FILE]: { content: JSON.stringify(data) } };
-      if (!id) remember(await find());
-      const r = id ? await call('PATCH', '/gists/' + id, { files })
-        : await call('POST', '/gists', { description: 'サブスク通帳の同期データ（パスコードで暗号化済み）', public: false, files });
-      if (r.status === 404 && id) { remember(''); return be.set(data); }
-      if (!r.ok) throw syncErr(r.status === 422 ? 'invalid_argument' : 'unavailable');
-      remember((await r.json()).id); etag = ''; cache = data;
-    },
-    async delete() { if (!id) remember(await find()); if (id) await call('DELETE', '/gists/' + id); remember(''); etag = ''; cache = null; },
-    onSnapshot(next, onError) {
-      let stop = false, last, timer = 0, busy = false;
-      const tick = async () => {
-        clearTimeout(timer);
-        if (stop) return;
-        if (!busy && document.visibilityState !== 'hidden') {
-          busy = true;
-          try { const d = await read(); const key = d ? d.ct : null; if (key !== last) { last = key; next(snapOf(d)); } }
-          catch (e) { if (e.code === 'unauthorized') { stop = true; if (onError) onError(e); return; } }
-          finally { busy = false; }
-        }
-        if (!stop) timer = setTimeout(tick, 20000);
-      };
-      const onVis = () => { if (document.visibilityState === 'visible') tick(); };
-      document.addEventListener('visibilitychange', onVis);
-      tick();
-      return () => { stop = true; clearTimeout(timer); document.removeEventListener('visibilitychange', onVis); };
-    }
-  };
-  return be;
+
+/* ───────── みんなのサブスク・人気ランキング・引き継ぎコード（Firebase の Firestore を REST で使う） ─────────
+   config.js に Firebase の設定があるときだけ動く。外に送るのは次の3つだけ:
+   ・人気ランキング: 追加したサービスの id（例: netflix）を1つ数える
+   ・みんなのサブスク: 公開を選んだサブスクの名前・カテゴリ・金額・支払い周期
+   ・引き継ぎコード: コードから作った鍵で暗号化したデータ（24時間で期限切れ。受け取ったら消す） */
+const APP_CFG = window.SUBSC_CONFIG || {};
+const FB = APP_CFG.firebase || {};
+const FB_ON = !!(FB.apiKey && FB.projectId && cryptoOK && window.fetch);
+const FB_PATH = FB_ON ? `projects/${FB.projectId}/databases/(default)/documents` : '';
+const FB_URL = FB_ON ? `${FB.base || 'https://firestore.googleapis.com'}/v1/${FB_PATH}` : '';
+const APP_URL = APP_CFG.appUrl || (/^https?:$/.test(location.protocol) ? location.origin + location.pathname : '');
+const ONLINE_KEY = 'subsc-tsucho/online';
+const online = { community: [], popularity: {}, state: FB_ON ? 'loading' : 'off', at: 0, busy: false, transfer: null, transferBusy: false };
+if (FB_ON) {
+  try {
+    const c = JSON.parse(localStorage.getItem(ONLINE_KEY) || 'null');
+    if (c && Array.isArray(c.community)) online.community = c.community;
+    if (c && c.popularity && typeof c.popularity === 'object') online.popularity = c.popularity;
+  } catch {}
 }
-async function connectGist(token) {
-  token = token.trim();
-  const be = gistBackend(token, '');
-  try { await be.check(); }
+const fv = v => typeof v === 'string' ? { stringValue: v } : Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: Number(v) };
+const unfv = x => !x ? null : 'stringValue' in x ? x.stringValue : 'integerValue' in x ? Number(x.integerValue) : 'doubleValue' in x ? x.doubleValue : 'timestampValue' in x ? x.timestampValue : null;
+const unDoc = d => { const o = { id: String(d.name || '').split('/').pop() }; for (const [k, v] of Object.entries(d.fields || {})) o[k] = unfv(v); return o; };
+async function fb(path, method = 'GET', body) {
+  let r;
+  try {
+    r = await fetch(`${FB_URL}${path}${path.includes('?') ? '&' : '?'}key=${encodeURIComponent(FB.apiKey)}`, {
+      method, cache: 'no-store', referrerPolicy: 'no-referrer',
+      headers: body ? { 'Content-Type': 'application/json' } : undefined,
+      body: body ? JSON.stringify(body) : undefined
+    });
+  } catch { throw Object.assign(new Error('offline'), { status: 0 }); }
+  if (!r.ok) throw Object.assign(new Error('http ' + r.status), { status: r.status });
+  const t = await r.text();
+  return t ? JSON.parse(t) : null;
+}
+const fbCommit = writes => fb(':commit', 'POST', { writes });
+const incWrite = (path, field) => ({ transform: { document: `${FB_PATH}/${path}`, fieldTransforms: [{ fieldPath: field, increment: { integerValue: '1' } }] } });
+const fbIncrement = (path, field) => fbCommit([incWrite(path, field)]);
+async function loadOnline() {
+  if (!FB_ON || online.busy) return;
+  online.busy = true;
+  try {
+    const [com, pop] = await Promise.all([fb('/community?pageSize=300&orderBy=adds%20desc'), fb('/popularity?pageSize=300')]);
+    online.community = ((com && com.documents) || []).map(unDoc)
+      .filter(x => typeof x.name === 'string' && x.name.trim() && (Number(x.reports) || 0) < 3 && CAT_NAME[x.cat] && CYC[x.cycle] && Number(x.price) >= 0)
+      .map(x => ({ id: x.id, name: x.name.slice(0, 60), cat: x.cat, price: Number(x.price), currency: x.currency === 'USD' ? 'USD' : 'JPY', cycle: x.cycle, adds: Number(x.adds) || 0 }));
+    online.popularity = Object.fromEntries(((pop && pop.documents) || []).map(unDoc).filter(x => SVC.has(x.id)).map(x => [x.id, Number(x.count) || 0]));
+    online.state = 'ok'; online.at = now();
+    try { localStorage.setItem(ONLINE_KEY, JSON.stringify({ community: online.community, popularity: online.popularity })); } catch {}
+  } catch { online.state = online.community.length || Object.keys(online.popularity).length ? 'stale' : 'error'; }
+  online.busy = false;
+  if (state) render();
+  if (editDlg.open && !$('#picker').hidden) renderPicker();
+}
+const markRanked = k => { const r = state.settings.ranked; if (!r.includes(k)) { r.push(k); if (r.length > 500) r.splice(0, r.length - 500); } };
+// 人気ランキング: まだ数えていないサービスだけを、まとめて1つずつ数える（同じ人が何度追加しても1回）
+let rankBusy = false;
+function rankCatchUp() {
+  if (!FB_ON || !state || !state.settings.rank || rankBusy) return;
+  const done = new Set(state.settings.ranked);
+  const ids = [...new Set(state.subs.filter(s => !s.sample && s.ref && SVC.has(s.ref.s)).map(s => s.ref.s))]
+    .filter(id => !done.has('s:' + id) && /^[a-z0-9-]{1,40}$/.test(id));
+  if (!ids.length) return;
+  rankBusy = true;
+  fbCommit(ids.map(id => incWrite('popularity/' + id, 'count')))
+    .then(() => { for (const id of ids) online.popularity[id] = (online.popularity[id] || 0) + 1; commit(() => ids.forEach(id => markRanked('s:' + id))); })
+    .catch(() => {})
+    .finally(() => { rankBusy = false; });
+}
+function countCommunity(cid) {
+  if (!FB_ON || !state.settings.rank || state.settings.ranked.includes('c:' + cid)) return;
+  fbIncrement('community/' + cid, 'adds').then(() => {
+    const c = online.community.find(x => x.id === cid); if (c) c.adds++;
+    commit(() => markRanked('c:' + cid));
+  }).catch(() => {});
+}
+// みんなのサブスクに公開: 同じ名前がもうあれば、新しく作らずに「追加した人数」を1つ増やす
+const communityKey = name => normQ(name).slice(0, 80);
+async function publishCommunity(s) {
+  const key = communityKey(s.name);
+  if (!key) return '';
+  const res = await fb(':runQuery', 'POST', { structuredQuery: { from: [{ collectionId: 'community' }], where: { fieldFilter: { field: { fieldPath: 'key' }, op: 'EQUAL', value: { stringValue: key } } }, limit: 1 } });
+  const hit = (res || []).find(r => r && r.document);
+  if (hit) {
+    const id = hit.document.name.split('/').pop();
+    if (!state.settings.ranked.includes('c:' + id)) {
+      await fbIncrement('community/' + id, 'adds');
+      const c = online.community.find(x => x.id === id); if (c) c.adds++;
+    }
+    return id;
+  }
+  const id = uid().replace(/[^a-z0-9]/gi, '').slice(0, 20);
+  const doc = { name: s.name.slice(0, 60), key, cat: s.cat, price: Math.round(s.price * 100) / 100, currency: s.cur, cycle: s.cycle, adds: 1, reports: 0 };
+  await fbCommit([{
+    update: { name: `${FB_PATH}/community/${id}`, fields: Object.fromEntries(Object.entries(doc).map(([k, v]) => [k, fv(v)])) },
+    currentDocument: { exists: false },
+    updateTransforms: [{ fieldPath: 'createdAt', setToServerValue: 'REQUEST_TIME' }]
+  }]);
+  online.community.push({ id, name: doc.name, cat: doc.cat, price: doc.price, currency: doc.currency, cycle: doc.cycle, adds: 1 });
+  return id;
+}
+// 引き継ぎコード: 10文字（読み間違えやすい I・O・0・1 は使わない）。中身はコードから作った鍵で暗号化して預ける。
+// 保存場所の文書名はコードのハッシュなので、コードを知らない人には場所も中身もわからない
+const TCHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+const fmtCode = c => c.slice(0, 5) + '-' + c.slice(5);
+const cleanCode = s => String(s || '').normalize('NFKC').toUpperCase().replace(/[^A-Z0-9]/g, '');
+async function transferId(code) {
+  const h = new Uint8Array(await crypto.subtle.digest('SHA-256', te.encode('subsc-tsucho:transfer:' + code)));
+  return [...h.slice(0, 16)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+async function createTransfer() {
+  const code = [...crypto.getRandomValues(new Uint8Array(10))].map(b => TCHARS[b % 32]).join('');
+  const salt = crypto.getRandomValues(new Uint8Array(16)), iv = crypto.getRandomValues(new Uint8Array(12));
+  const key = await deriveKey(code, salt, 200000);
+  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, te.encode(JSON.stringify({ app: 'subsc-tsucho', v: 2, data: state })));
+  const expire = new Date(now() + 24 * 3600 * 1000);
+  await fb(`/transfer?documentId=${await transferId(code)}`, 'POST', { fields: { salt: fv(b64(salt)), iv: fv(b64(iv)), ct: fv(b64(ct)), iter: fv(200000), expireAt: { timestampValue: expire.toISOString() } } });
+  return { code, expire };
+}
+async function receiveTransfer(raw) {
+  const code = cleanCode(raw);
+  if (code.length !== 10) return { err: '10文字の引き継ぎコードを入力してください（ハイフンはなくても大丈夫です）。' };
+  const id = await transferId(code);
+  let d;
+  try { d = unDoc(await fb('/transfer/' + id)); }
   catch (e) {
-    return e.code === 'unauthorized' ? 'トークンが正しくないか、期限が切れています。'
-      : e.code === 'noscope' ? 'このトークンには gist の権限がありません。作り直すときに「gist」にチェックを入れてください。'
-      : 'GitHub に接続できませんでした。通信状態を確認してください。';
+    return { err: e.status === 404 ? 'コードが見つかりません。入力ミスか、使用済み・取り消し済みのコードかもしれません。'
+      : e.status === 403 ? 'このコードは期限切れです。元の画面でもう一度発行してください。'
+      : e.status === 0 ? '通信できませんでした。電波のよいところでもう一度お試しください。'
+      : 'うまくいきませんでした。少し待ってからお試しください。' };
   }
-  device.gistToken = token; device.gistId = ''; saveDevice();
-  sync.ref = be; sync.avail = 'yes';
-  try { const s = await be.get(); sync.remoteExists = !!s.exists; } catch {}
-  render();
-  toast('GitHub に接続しました');
-  return '';
-}
-async function initSync() {
-  if (IN_CLAUDE) {
-    sync.kind = 'claude';
-    let db = null, user = null, id = null;
-    try { [db, user] = await Promise.all([window.claude.use('db'), window.claude.use('user')]); } catch {}
-    try { id = user ? await user.id() : null; } catch {}
-    if (!db || !id) { sync.avail = 'no'; render(); return; }
-    try { sync.ref = db.doc('data/users/' + id + '/vault'); } catch { sync.avail = 'no'; render(); return; }
-  } else {
-    sync.kind = 'gist';
-    if (!device.gistToken) { sync.avail = 'needtoken'; render(); return; }
-    sync.ref = gistBackend(device.gistToken, device.gistId);
-  }
-  sync.avail = 'yes';
-  if (device.sync) { if (session) startSync(); else sync.status = 'locked'; }
-  else { try { const snap = await sync.ref.get(); sync.remoteExists = !!snap.exists; } catch {} }
-  render();
-}
-function startSync() {
-  if (!sync.ref || !session || sync.unsub) return;
-  sync.status = 'connecting';
-  sync.unsub = sync.ref.onSnapshot(snap => { remoteQueue = remoteQueue.then(() => handleRemote(snap)).catch(() => {}); },
-    err => { sync.unsub = null; sync.status = 'error'; sync.err = (err && err.code) || ''; render(); });
-  render();
-}
-function stopSync() { if (sync.unsub) { try { sync.unsub(); } catch {} sync.unsub = null; } sync.status = 'off'; clearTimeout(pushTimer); }
-let remoteQueue = Promise.resolve();
-async function handleRemote(snap) {
-  if (!device.sync || !session || !state) return;
-  if (!snap.exists) {
-    if (sync.hadRemote) {
-      device.sync = false; saveDevice(); stopSync(); sync.remoteExists = false; sync.hadRemote = false;
-      render(); toast('同期の保存場所が削除されたため、この端末の同期を止めました');
-      return;
-    }
-    sync.remoteJSON = ''; schedulePush(0); return;
-  }
-  sync.hadRemote = true; sync.remoteExists = true;
-  const d = snap.data();
-  if (!d || typeof d.ct !== 'string') return;
-  if (d.ct === sync.lastCt) {
-    if (!snap.metadata || !snap.metadata.hasPendingWrites) { sync.status = 'ok'; sync.lastAt = now(); renderSyncBits(); }
-    return;
-  }
-  let remote;
+  if (!d.expireAt || Date.parse(d.expireAt) < now()) return { err: 'このコードは期限切れです。元の画面でもう一度発行してください。' };
   try {
-    if (d.salt !== b64(session.salt)) throw new Error('salt');
-    remote = normalize(await openWithKey(d, session.key));
-  } catch { sync.status = 'needpass'; sync.pending = d; render(); return; }
-  sync.lastCt = d.ct;
-  applyRemote(remote);
+    const key = await deriveKey(code, unb64(d.salt), clampInt(d.iter, 100000, 2000000, 200000));
+    const obj = JSON.parse(td.decode(await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(d.iv) }, key, unb64(d.ct))));
+    if (!obj || obj.app !== 'subsc-tsucho' || !obj.data) throw new Error('bad');
+    return { data: obj.data, id };
+  } catch { return { err: 'データを開けませんでした。コードをもう一度確かめてください。' }; }
 }
-function applyRemote(remote) {
-  const rj = canon(syncPart(remote));
-  sync.remoteJSON = rj;
-  const merged = mergeStates(state, remote);
-  const mj = canon(syncPart(merged));
-  if (mj !== canon(syncPart(state))) { state = merged; queueSave(); }
-  sync.status = 'ok'; sync.lastAt = now(); sync.pending = null;
-  render();
-  if (mj !== rj) schedulePush(600);
-}
-let pushTimer = 0;
-function schedulePush(ms = 1200) { if (!syncOn()) return; clearTimeout(pushTimer); pushTimer = setTimeout(pushNow, ms); }
-async function pushNow() {
-  if (!syncOn() || sync.status === 'needpass' || !state) return;
-  if (sync.pushing) { sync.again = true; return; }
-  const part = syncPart(state), json = canon(part);
-  if (json === sync.remoteJSON) return;
-  sync.pushing = true; sync.status = 'pushing'; renderSyncBits();
-  try {
-    const sealed = await seal(part, session);
-    sealed.updatedAt = now();
-    sync.lastCt = sealed.ct;
-    await sync.ref.set(sealed);
-    sync.remoteJSON = json; sync.status = 'ok'; sync.lastAt = now(); sync.hadRemote = true; sync.remoteExists = true;
-  } catch (e) {
-    sync.status = 'error'; sync.err = (e && e.code) || '';
-  } finally {
-    sync.pushing = false; renderSyncBits();
-    if (sync.again) { sync.again = false; schedulePush(300); }
+
+/* ───────── ダイアログを開いている間は後ろの画面を固定する（スマホで後ろの画面がスクロールしないように） ───────── */
+// 閉じたことを知らせる close イベントは遅れて届くことがあるので、自分で閉じるときは closeDlg ですぐに固定を外す
+let lockY = 0;
+const openDlgs = new Set();
+function showDlg(d) {
+  if (d.open) return;
+  d.showModal();
+  if (!openDlgs.size) {
+    lockY = window.scrollY || 0;
+    Object.assign(document.body.style, { position: 'fixed', top: `-${lockY}px`, left: '0', right: '0', width: '100%' });
   }
+  openDlgs.add(d);
+  for (const b of d.querySelectorAll('.dlg-body')) b.scrollTop = 0; // 前回スクロールした位置を残さない
 }
-// 同期のパスコードは設定画面のフォームで受け取る（スマホではポップアップがキーボードや画面端に隠れるため）。
-// 失敗したときは画面に出すメッセージを返し、成功したら空文字を返す。
-async function beginSync(pass) {
-  if (!sync.ref) return 'この画面では同期を使えません。';
-  if (!session) {
-    if (!pass) return 'パスコードを入力してください。';
-    session = await newSession(pass);
-    device.lockOnOpen = false;
-  }
-  clearSamples();
-  device.sync = true; saveDevice();
-  await rememberKey();
-  sync.remoteJSON = '';
-  queueSave(); startSync(); render();
-  toast('同期を始めました');
-  return '';
-}
-async function joinSync(pass) {
-  if (!sync.ref) return 'この画面では同期を使えません。';
-  let snap;
-  try { snap = await sync.ref.get(); } catch { return '同期データを確認できませんでした。少し待ってから試してください。'; }
-  if (!snap.exists) { sync.remoteExists = false; render(); return 'ほかの端末の同期データが見つかりません。先に別の端末で「同期を始める」を押してください。'; }
-  const d = snap.data();
-  let res;
-  try { res = await unseal(d, pass); } catch { return 'パスコードが違います。'; }
-  clearSamples();
-  session = res.sess;
-  if (device.lockOnOpen === null) device.lockOnOpen = false;
-  device.sync = true; saveDevice();
-  await rememberKey();
-  sync.lastCt = d.ct; sync.hadRemote = true;
-  applyRemote(normalize(res.data));
-  queueSave(); startSync();
-  toast('同期しました');
-  return '';
-}
-async function repass(pass) {
-  const d = sync.pending;
-  if (!d) return '同期データを読み直しています。少し待ってから試してください。';
-  let res;
-  try { res = await unseal(d, pass); } catch { return 'パスコードが違います。'; }
-  session = res.sess;
-  await rememberKey();
-  sync.lastCt = d.ct;
-  applyRemote(normalize(res.data));
-  queueSave();
-  toast('同期を再開しました');
-  return '';
-}
-function goSync(formId) {
-  setTab('settings');
-  render();
-  requestAnimationFrame(() => {
-    const f = document.getElementById(formId);
-    (f || $('.sync-card')).scrollIntoView({ block: 'center' });
-    if (f && finePointer()) f.elements.p1.focus();
-  });
+function closeDlg(d) { if (d.open) d.close(); releaseDlg(d); }
+function releaseDlg(d) {
+  if (!openDlgs.delete(d) || openDlgs.size) return;
+  Object.assign(document.body.style, { position: '', top: '', left: '', right: '', width: '' });
+  const root = document.documentElement, prev = root.style.scrollBehavior;
+  root.style.scrollBehavior = 'auto';
+  window.scrollTo(0, lockY);
+  root.style.scrollBehavior = prev;
 }
 
 /* ───────── 計算 ───────── */
@@ -1430,37 +1425,17 @@ function manageLink(s) {
 function render() {
   if (!state) return;
   $('#sampleBanner').hidden = !state.subs.some(s => s.sample);
-  $('#joinBanner').hidden = !(sync.avail === 'yes' && !device.sync && sync.remoteExists);
-  $('#repassBanner').hidden = !(device.sync && sync.status === 'needpass');
   const hb = $('#btnHide');
   hb.innerHTML = device.hideAmounts ? ICON.eyeOff : ICON.eye;
   hb.setAttribute('aria-pressed', String(device.hideAmounts));
   hb.title = device.hideAmounts ? '金額を表示する' : '金額を隠す';
   const lb = $('#btnLock'); lb.hidden = !(session && device.lockOnOpen); lb.innerHTML = ICON.lock;
-  renderSyncBits();
+  $('#privacyBadge').innerHTML = session ? ICON.lock + '暗号化してこの端末に保存' : ICON.device + 'この端末のブラウザだけに保存';
   renderOverview();
+  renderPopular();
   renderList();
   renderCalendar();
   renderSettings();
-}
-function renderSyncBits() {
-  const badge = $('#privacyBadge');
-  if (device.sync && session) {
-    const warn = sync.status === 'error' || sync.status === 'needpass';
-    badge.innerHTML = `<span class="dot${warn ? ' warn' : ''}"></span>${warn ? '同期が止まっています' : '暗号化して同期中'}${sync.lastAt && !warn ? `・${hhmm(sync.lastAt)}` : ''}`;
-  } else if (session) badge.innerHTML = ICON.lock + '暗号化してこの端末に保存';
-  else badge.innerHTML = ICON.device + 'この端末のブラウザだけに保存';
-  const el = $('#syncState');
-  if (!el) return;
-  const map = {
-    ok: ['on', ICON.check + `同期済み${sync.lastAt ? '・' + hhmm(sync.lastAt) : ''}`],
-    pushing: ['on', ICON.sync + '送信中…'], connecting: ['', ICON.sync + '接続中…'],
-    needpass: ['warn', ICON.lock + 'パスコードの入力が必要'], error: ['crit', '同期できませんでした'],
-    locked: ['', ICON.lock + 'ロック中'], off: ['', '']
-  };
-  const [cls, txt] = device.sync ? (map[sync.status] || ['', '']) : ['', '未設定'];
-  el.className = 'status-line ' + cls;
-  el.innerHTML = txt;
 }
 
 function renderOverview() {
@@ -1623,10 +1598,13 @@ function buildAlerts(gi) {
       if (o) A.push({ level: 'warn', key: `dup:${s.id}:${o.id}`, title: `${nm(o)} は ${nm(s)} に含まれているかもしれません`, body: `二重に払っている可能性があります（${yen(perMonth(o))}／月）。含まれる内容はプランによって違うので確認を。`, actions: [btn(esc(o.name) + ' を編集', 'edit', o.id)] });
     }
   }
-  if (state.subs.some(s => !s.sample) && !(device.sync && sync.status === 'ok')) {
+  const hasMine = state.subs.some(s => !s.sample);
+  if (hasMine) {
     const lb = st.lastBackup ? parseD(st.lastBackup) : null, age = lb ? daysBetween(lb, t) : Infinity;
-    if (age > 30) A.push({ level: 'info', title: lb ? `最後のバックアップから${age}日たちました` : 'まだバックアップがありません', body: 'データはこのブラウザの中にしかありません。同期をオンにするか、ときどきバックアップを書き出してください。', actions: [btn('同期を設定する', 'goto-sync'), btn('バックアップを書き出す', 'export-json')] });
+    if (age > 30) A.push({ level: 'info', title: lb ? `最後のバックアップから${age}日たちました` : 'まだバックアップがありません', body: 'データはこのブラウザの中にしかありません。機種変更やブラウザの切り替えに備えて、ときどきバックアップを書き出してください。', actions: [btn('バックアップを書き出す', 'export-json')] });
   }
+  if (isStandalone() && !hasMine) A.push({ level: 'info', key: 'standalone-transfer', title: 'ブラウザで登録したデータを移せます', body: 'ホーム画面に追加したアプリは、Safari などのブラウザとデータの保存場所が別々です。元のブラウザの［設定］→「ほかのブラウザ・機種に引き継ぐ」で移せます。', actions: [btn('引き継ぎの画面へ', 'goto-transfer')] });
+  else if (isIOS() && !isStandalone() && hasMine) A.push({ level: 'info', key: 'ios-home', title: 'ホーム画面に追加するときは、データの引き継ぎを', body: 'ホーム画面に追加したアプリは、Safari とは別の保存場所から始まります。追加したあと、［設定］→「ほかのブラウザ・機種に引き継ぐ」でデータを移してください。', actions: [btn('引き継ぎの方法を見る', 'goto-transfer')] });
   const order = { crit: 0, warn: 1, info: 2, good: 3 };
   return A.filter(a => !a.key || !dis[a.key]).map(a => ({ ...a, actions: (a.actions || []).filter(Boolean) })).sort((a, b) => order[a.level] - order[b.level]);
 }
@@ -1693,57 +1671,51 @@ function renderCalendar() {
     <tfoot><tr><td class="ln"></td><td colspan="2">合計</td><td class="amt r">${yen(sum(ch, c => c.amt))}</td></tr></tfoot></table></div>` : '<div class="none">この月の請求はありません。</div>');
 }
 
-function passForm(id, label, btnLabel, twice) {
-  return `<form class="inline-pass" id="${id}" novalidate>
-    <label class="f"><span>${label}</span><input type="password" name="p1" autocomplete="${twice ? 'new-password' : 'current-password'}" enterkeyhint="${twice ? 'next' : 'go'}"></label>
-    ${twice ? '<label class="f"><span>もう一度入力</span><input type="password" name="p2" autocomplete="new-password" enterkeyhint="go"></label>' : ''}
-    <button class="btn primary" type="submit">${btnLabel}</button>
-    <p class="err" role="alert" hidden></p>
-  </form>`;
+const isStandalone = () => { try { return matchMedia('(display-mode: standalone)').matches || navigator.standalone === true; } catch { return false; } };
+const isIOS = () => /iP(hone|od|ad)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+function renderTransfer() {
+  const box = $('#transferSend');
+  if (!FB_ON || !box) return;
+  const t = online.transfer && online.transfer.expire > now() ? online.transfer : null;
+  if (!t) online.transfer = null;
+  const key = t ? t.code : online.transferBusy ? 'busy' : 'none';
+  if (box.dataset.key === key) return;
+  box.dataset.key = key;
+  box.innerHTML = t ? `<div class="code-box"><span class="code">${fmtCode(t.code)}</span><button class="btn sm" data-action="transfer-copy">コピー</button></div>
+      <p class="small muted" style="margin:0">${mdw(t.expire)} ${hhmm(t.expire)} まで・1回だけ使えます。コードを知っている人はデータを読めるので、人に見せないでください。発行したあとに変えた内容は含まれません。</p>
+      <div class="btn-row"><button class="btn sm" data-action="transfer-cancel">このコードを取り消す</button></div>`
+    : `<p class="small" style="margin:0 0 8px">いまのデータをコードで暗号化して一時的に預け、10文字の引き継ぎコードを表示します。</p>
+      <div class="btn-row"><button class="btn primary" data-action="transfer-create"${online.transferBusy ? ' disabled' : ''}>${online.transferBusy ? '発行中…' : '引き継ぎコードを発行'}</button></div>`;
 }
-function gistSetupHTML() {
-  const url = 'https://github.com/settings/tokens/new?scopes=gist&description=' + encodeURIComponent('サブスク通帳');
-  return `<ol class="sync-steps">
-    <li><a href="${url}" target="_blank" rel="noopener noreferrer">GitHub のトークン作成ページ ↗</a> を開きます（GitHub にログインした状態で）。</li>
-    <li>「gist」だけにチェックが入っていることを確かめ、有効期限を選んで「Generate token」を押します。</li>
-    <li>表示された <code>ghp_</code> で始まる文字列をコピーして、下に貼り付けます。</li>
-  </ol>
-  <form class="inline-pass" id="gistForm" novalidate>
-    <label class="f"><span>GitHub のトークン</span><input type="password" name="p1" autocomplete="off" spellcheck="false" autocapitalize="off" enterkeyhint="go" placeholder="ghp_…"></label>
-    <button class="btn primary" type="submit">接続する</button>
-    <p class="err" role="alert" hidden></p>
-  </form>
-  <p class="small muted">トークンはこの端末のブラウザに保存し、GitHub との通信にだけ使います。gist 以外の権限は付けないでください。スマホでは、同じ手順でもう1つ作るか、同じトークンを貼り付けます。</p>`;
+function onlineInfoText() {
+  if (!FB_ON) return '';
+  if (online.state === 'loading') return '読み込み中…';
+  if (online.state === 'error') return '通信できませんでした。オンラインになると表示されます。';
+  const n = Object.values(online.popularity).filter(v => v > 0).length;
+  return `いま: みんなのサブスク ${online.community.length}件・ランキング ${n}サービス${online.state === 'stale' ? '（前回読み込んだ情報）' : ''}`;
 }
-function renderSyncBody() {
-  const sb = $('#syncBody');
-  $('#syncIntro').innerHTML = sync.kind === 'gist'
-    ? 'あなたの <b>GitHub アカウントの非公開 Gist</b> に、パスコードで暗号化したデータを置いて、端末どうしで同じ内容を表示します。暗号化はこの画面の中で行うので、Gist にあるのは読めない暗号文だけです。GitHub を含め、パスコードを知らない人には中身が見えません。'
-    : 'Claude アカウントの中にある<b>あなた専用の保存場所</b>に、パスコードで暗号化したデータを置いて、端末どうしで同じ内容を表示します。暗号化はこの画面の中で行うので、保存場所にあるのは読めない暗号文だけです。Anthropic や Claude を含め、パスコードを知らない人には中身が見えません。';
-  const ae = document.activeElement;
-  if (ae && ae.tagName === 'INPUT' && sb.contains(ae)) return; // 入力中のパスコードを消さない
-  const gistOff = sync.kind === 'gist' ? '<button class="btn link small" data-action="gist-disconnect" style="color:var(--ink-3);font-weight:500">GitHub との接続を解除</button>' : '';
-  if (sync.avail === 'checking') sb.innerHTML = '<p class="small muted">同期を使えるか確認しています…</p>';
-  else if (sync.avail === 'needtoken') sb.innerHTML = cryptoOK ? gistSetupHTML() : '<p class="small" style="color:var(--warn)">このブラウザでは暗号化機能を使えないため、同期できません。</p>';
-  else if (sync.avail === 'no') sb.innerHTML = `<p class="small" style="color:var(--warn)">この画面では同期を使えません。claude.ai にサインインした状態で、このページのリンクを開いてください。</p>`;
-  else if (!cryptoOK) sb.innerHTML = '<p class="small" style="color:var(--warn)">このブラウザでは暗号化機能を使えないため、同期できません。</p>';
-  else if (!device.sync) {
-    const where = sync.kind === 'gist' ? '同じ GitHub アカウントのトークンでこのページを開きます' : '同じアカウントでこのページを開きます';
-    sb.innerHTML = (sync.remoteExists
-      ? `<p><b>ほかの端末の同期データがあります。</b>そのとき決めたパスコードを入力すると、この端末でも同じ内容になります。この端末で登録した分は合わせて残ります。</p>${passForm('joinForm', 'ほかの端末で決めたパスコード', '同期する', false)}`
-      : `<ol class="sync-steps"><li>この端末でパスコードを決めて「同期を始める」を押します。</li><li>スマホ（またはPC）で、${where}。</li><li>「設定・同期」で同じパスコードを入れて「同期する」を押します。</li></ol>${session ? '<div class="btn-row"><button class="btn primary" data-action="begin-sync">いまのパスコードで同期を始める</button></div>' : passForm('beginForm', '同期のパスコード（4文字以上）', '同期を始める', true)}`) + gistOff;
-  } else {
-    const errText = sync.err === 'unauthorized' ? 'GitHub のトークンが無効になりました（期限切れなど）。「GitHub との接続を解除」してから、新しいトークンで接続し直してください。'
-      : `保存場所に書き込めませんでした${sync.err ? `（${esc(sync.err)}）` : ''}。通信状態を確認して、もう一度お試しください。`;
-    sb.innerHTML = `<p class="small muted">変更は${sync.kind === 'gist' ? '20秒ほど' : '数秒'}で、ほかの端末に反映されます。同じサブスクを両方の端末で同時に編集した場合は、あとで保存したほうが残ります。</p>
-      ${sync.status === 'needpass' ? passForm('repassForm', 'ほかの端末で変更した新しいパスコード', '同期を再開', false) : ''}
-      ${sync.status === 'error' ? `<p class="small" style="color:var(--crit)">${errText}</p>` : ''}
-      <div class="btn-row">${sync.status === 'error' ? '<button class="btn" data-action="retry-sync">もう一度試す</button>' : ''}<button class="btn" data-action="stop-sync">この端末の同期を止める</button><button class="btn danger-ghost" data-action="delete-cloud">${sync.kind === 'gist' ? 'Gist から同期データを消す' : '同期の保存場所からデータを消す'}</button></div>${gistOff}`;
-  }
+function renderPopular() {
+  if (!FB_ON) return;
+  const mine = new Set();
+  for (const s of state.subs) if (!s.sample && isLive(s)) { if (s.ref) mine.add('s:' + s.ref.s); if (s.cid) mine.add('c:' + s.cid); }
+  const items = [
+    ...Object.entries(online.popularity).filter(([id, n]) => n > 0 && SVC.has(id)).map(([id, n]) => { const v = SVC.get(id); return { k: 's:' + id, name: v.name, cat: v.cat, n, act: `data-action="add-from" data-svc-id="${esc(id)}"` }; }),
+    ...online.community.filter(c => c.adds > 0).map(c => ({ k: 'c:' + c.id, name: c.name, cat: c.cat, n: c.adds, comm: true, act: `data-action="add-community" data-cid="${esc(c.id)}"` }))
+  ].sort((a, b) => b.n - a.n).slice(0, 10);
+  const top = items.length ? items[0].n : 1;
+  $('#popList').innerHTML = items.length ? items.map((x, i) => `<li class="pop-row cat-${esc(x.cat)}">
+      <span class="pop-rank">${i + 1}</span>${mono(x.name, x.cat, true)}
+      <span class="pop-name"><span>${esc(x.name)}${x.comm ? ' <span class="badge comm">みんなの追加</span>' : ''}${mine.has(x.k) ? ' <span class="badge stu">登録済み</span>' : ''}</span><span class="pop-bar"><i style="width:${(x.n / top * 100).toFixed(1)}%"></i></span></span>
+      <span class="pop-n">${nf0.format(x.n)}人</span>
+      ${mine.has(x.k) ? '<span></span>' : `<button class="btn sm" ${x.act} aria-label="${esc(x.name)} を追加" title="追加">＋</button>`}
+    </li>`).join('')
+    : `<li class="empty-note">${online.state === 'loading' ? '読み込み中…' : online.state === 'error' ? '読み込めませんでした。オンラインになると表示されます。' : 'まだデータがありません。サブスクを追加すると、ここに人気順で並びます。'}</li>`;
 }
 function renderSettings() {
   const st = state.settings;
-  renderSyncBody();
+  renderTransfer();
+  $('#sRank').checked = !!st.rank;
+  $('#onlineInfo').textContent = onlineInfoText();
   // 学生
   $('#sStudent').checked = !!st.student;
   const setVal = (el, v) => { if (document.activeElement !== el) el.value = v; };
@@ -1759,7 +1731,7 @@ function renderSettings() {
     : `<span class="status-line">${ICON.device}未設定</span>`;
   $('#lockOptions').innerHTML = session ? `<label class="switch"><input type="checkbox" id="sLockOpen"${device.lockOnOpen ? ' checked' : ''}> 開くたびにパスコードを求める（この端末）</label>` : '';
   $('#lockButtons').innerHTML = !cryptoOK ? '<p class="small muted">このブラウザでは暗号化機能を使えません。</p>'
-    : session ? `${device.lockOnOpen ? '<button class="btn" data-action="lock-now">今すぐロック</button>' : ''}<button class="btn" data-action="set-lock">パスコードを変更</button><button class="btn danger-ghost" data-action="remove-lock"${device.sync ? ' disabled title="同期中は外せません"' : ''}>パスコードをやめる</button>`
+    : session ? `${device.lockOnOpen ? '<button class="btn" data-action="lock-now">今すぐロック</button>' : ''}<button class="btn" data-action="set-lock">パスコードを変更</button><button class="btn danger-ghost" data-action="remove-lock">パスコードをやめる</button>`
     : '<button class="btn primary" data-action="set-lock">パスコードを設定する</button>';
   $('#backupInfo').innerHTML = (st.lastBackup ? `最後に書き出した日: <b>${esc(st.lastBackup)}</b>。` : 'まだ書き出していません。') + (session ? 'パスコード設定中は、バックアップも同じパスコードで暗号化します。' : '');
   setVal($('#sBudget'), st.budget || '');
@@ -1844,8 +1816,9 @@ function openEdit(id, opts = {}) {
   if (id && !s) return;
   ui.editId = s ? s.id : null;
   ui.editRef = s && s.ref ? { ...s.ref } : null;
+  ui.editCid = s ? s.cid || '' : '';
   ui.delArmed = false;
-  ui.pick = { cat: 'all', q: '', svc: opts.svc || null };
+  ui.pick = { cat: opts.cat || (opts.svc && SVC.get(opts.svc) ? SVC.get(opts.svc).cat : 'all'), q: '', svc: opts.svc || null, more: false };
   $('#editTitle').innerHTML = s ? `${mono(s.name, s.cat, true)}<span>サブスクを編集</span>` : 'サブスクを追加';
   $('#fName').value = s ? s.name : '';
   $('#fPlan').value = s ? s.plan : '';
@@ -1865,21 +1838,59 @@ function openEdit(id, opts = {}) {
   $('#pickQ').value = '';
   $('#picker').hidden = !!s;
   $('#formErr').hidden = true;
+  $('#fPublish').checked = false;
   const del = $('#btnDelete'); del.hidden = !s; del.textContent = '削除'; del.classList.remove('danger');
   renderPicker(); renderPicked(); renderCompare(); renderEditLinks();
-  editDlg.showModal();
+  showDlg(editDlg);
+  if (FB_ON && now() - online.at > 10 * 60 * 1000) loadOnline();
   if (opts.compare && !$('#compare').hidden) setTimeout(() => $('#compare').scrollIntoView({ block: 'start', behavior: 'smooth' }), 60);
   else if (!s && !opts.svc && finePointer()) setTimeout(() => $('#pickQ').focus(), 30);
 }
-function closeEdit() { editDlg.close(); }
+function closeEdit() { closeDlg(editDlg); }
+// 「すべて」で最初に並べる順（人気のデータがまだないときの目安）
+const STARTER = ['spotify', 'amazonprime', 'youtube', 'netflix', 'icloud', 'goodnotes', 'chatgpt', 'applemusic', 'disneyplus', 'nso', 'unext', 'abema', 'danime', 'duolingo', 'ahamo', 'm365', 'linemusic', 'kindleunlimited'];
+function popOrder(list) {
+  const pop = online.popularity, st = new Map(STARTER.map((id, i) => [id, i]));
+  const rank = id => st.has(id) ? st.get(id) : 999;
+  return list.map((s, i) => ({ s, i })).sort((a, b) => (pop[b.s.id] || 0) - (pop[a.s.id] || 0) || rank(a.s.id) - rank(b.s.id) || a.i - b.i).map(x => x.s);
+}
+function popRanks() {
+  const r = new Map();
+  Object.entries(online.popularity).filter(([id, n]) => n > 0 && SVC.has(id)).sort((a, b) => b[1] - a[1]).slice(0, 10).forEach(([id], i) => r.set(id, i + 1));
+  return r;
+}
+const commPrice = c => `${c.currency === 'USD' ? '$' + nf2.format(c.price) : '¥' + nf0.format(c.price)}／${parseCycle(c.cycle).per}`;
 function renderPicker() {
   const q = normQ(ui.pick.q), cat = ui.pick.cat;
   const used = new Set(CATALOG.services.map(s => s.cat));
+  const pop = online.popularity, ranks = popRanks();
   $('#pickMeta').textContent = CATALOG.version ? `${CATALOG.services.length}サービス・${CATALOG.version} 時点の参考価格` : '';
-  $('#pickCats').innerHTML = [{ id: 'all', name: 'すべて' }, ...CATS.filter(c => used.has(c.id))].map(c => `<button type="button" class="chip" data-pickcat="${c.id}" aria-pressed="${c.id === cat}">${esc(c.name)}</button>`).join('');
-  const list = CATALOG.services.filter(s => (cat === 'all' || s.cat === cat) && (!q || normQ(s.name + ' ' + (s.kana || '')).includes(q)));
-  $('#pickList').innerHTML = list.length ? list.map(s => `<button type="button" class="svc" data-svc="${esc(s.id)}" aria-pressed="${ui.pick.svc === s.id}">${mono(s.name, s.cat, true)}<span class="svc-text"><span class="svc-name">${esc(s.name)}</span><span class="svc-from">${minPlanText(s)}</span></span></button>`).join('')
-    : `<p class="small muted" style="margin:4px">見つかりません。下の欄に直接入力してください。</p>`;
+  const chips = [{ id: 'all', name: 'すべて' }];
+  if (FB_ON) chips.push({ id: 'popular', name: '人気' }, { id: 'community', name: 'みんなの追加' });
+  chips.push(...CATS.filter(c => used.has(c.id)));
+  $('#pickCats').innerHTML = chips.map(c => `<button type="button" class="chip" data-pickcat="${c.id}" aria-pressed="${c.id === cat}">${esc(c.name)}</button>`).join('');
+  const hit = s => !q || normQ(s.name + ' ' + (s.kana || '')).includes(q);
+  let list = [], comm = [], empty = '見つかりません。下の欄に直接入力してください。';
+  if (cat === 'community') {
+    comm = online.community.filter(c => !q || normQ(c.name).includes(q)).sort((a, b) => b.adds - a.adds);
+    empty = online.state === 'loading' ? '読み込み中…' : online.state === 'error' ? '読み込めませんでした。通信を確認してください。' : 'まだありません。一覧にないサブスクを追加するときに「公開する」を選ぶと、ここに並びます。';
+  } else if (cat === 'popular') {
+    list = CATALOG.services.filter(s => (pop[s.id] || 0) > 0 && hit(s)).sort((a, b) => pop[b.id] - pop[a.id]).slice(0, 30);
+    empty = online.state === 'loading' ? '読み込み中…' : 'まだランキングのデータがありません。';
+  } else {
+    list = CATALOG.services.filter(s => (cat === 'all' || s.cat === cat) && hit(s));
+    if (cat === 'all' && !q) list = popOrder(list);
+    if (q) {
+      const names = new Set(CATALOG.services.map(s => normQ(s.name)));
+      comm = online.community.filter(c => normQ(c.name).includes(q) && !names.has(normQ(c.name)));
+    }
+  }
+  const cap = cat === 'all' && !q && !ui.pick.more ? 12 : Infinity;
+  const svcBtn = s => `<button type="button" class="svc" data-svc="${esc(s.id)}" aria-pressed="${ui.pick.svc === s.id}">${mono(s.name, s.cat, true)}<span class="svc-text"><span class="svc-name">${esc(s.name)}</span><span class="svc-from">${ranks.has(s.id) ? `<span class="badge hot">人気${ranks.get(s.id)}位</span> ` : ''}${cat === 'popular' ? `${nf0.format(pop[s.id])}人が追加` : minPlanText(s)}</span></span></button>`;
+  const commBtn = c => `<button type="button" class="svc" data-comm="${esc(c.id)}">${mono(c.name, c.cat, true)}<span class="svc-text"><span class="svc-name">${esc(c.name)}</span><span class="svc-from"><span class="badge comm">みんな</span> ${commPrice(c)}・${nf0.format(c.adds)}人</span></span></button>`;
+  const html = list.slice(0, cap).map(svcBtn).join('') + comm.map(commBtn).join('')
+    + (list.length > cap ? `<button type="button" class="svc more" data-action="pick-more">ほかの ${list.length - cap} サービスも表示</button>` : '');
+  $('#pickList').innerHTML = html || `<p class="small muted" style="margin:4px">${empty}</p>`;
   const svc = ui.pick.svc && SVC.get(ui.pick.svc);
   const pp = $('#pickPlans');
   pp.hidden = !svc;
@@ -1889,9 +1900,27 @@ function renderPicker() {
       ${svc.plans.map(p => { const m = pmeta(p); return `<button type="button" class="plan" data-plan="${esc(p.id)}"><span>${esc(p.name)}${m.seats ? `<span class="badge seats">最大${m.seats}人</span>` : ''}${m.cond ? `<span class="badge${isStu(p) ? ' stu' : ''}">${esc(m.cond)}</span>` : ''}${m.note ? `<br><span class="small muted">${esc(m.note)}</span>` : ''}</span><b>${planPrice(p)}${p.price ? '／' + parseCycle(p.c).per : ''}</b></button>`; }).join('')}`;
   }
 }
+function pickCommunity(id) {
+  const c = online.community.find(x => x.id === id);
+  if (!c) return;
+  ui.editRef = null; ui.editCid = c.id;
+  $('#fName').value = c.name; $('#fCat').value = c.cat; $('#fPlan').value = '';
+  $('#fPrice').value = c.price; $('#fCur').value = c.currency; $('#fCycle').value = c.cycle;
+  $('#picker').hidden = true;
+  renderPicked(); renderCompare(); renderEditLinks();
+  if (finePointer()) $('#fAnchor').focus();
+}
 function renderPicked() {
   const box = $('#picked');
   const cp = catalogPlan(ui.editRef);
+  const c = !cp && !ui.editId && ui.editCid ? online.community.find(x => x.id === ui.editCid) : null;
+  $('#publishWrap').hidden = !(FB_ON && !cp && !ui.editCid);
+  if (c) {
+    box.hidden = false;
+    box.innerHTML = `<span>みんなのサブスクから：<b>${esc(c.name)}</b>（${nf0.format(c.adds)}人が追加）<br><span class="small muted">金額はほかの人が入力した参考値です。実際の金額に合わせてください</span></span>
+      <span style="display:flex;gap:8px;flex-wrap:wrap"><button type="button" class="btn sm" data-action="repick">選び直す</button><button type="button" class="btn sm" data-action="report-community">不適切なら報告</button></span>`;
+    return;
+  }
   if (!cp) { box.hidden = true; return; }
   box.hidden = false;
   box.innerHTML = `<span>価格データと連携中：<b>${esc(cp.svc.name)}</b> › ${esc(cp.plan.name)}（${planPrice(cp.plan)}${cp.plan.price ? '／' + parseCycle(cp.plan.c).per : ''}）<br><span class="small muted">価格が改定されたら「お知らせ」に表示します</span></span>
@@ -1937,6 +1966,7 @@ function choosePlan(svcId, planId, keepFields = false) {
   if (!p) return;
   const prevCycle = $('#fCycle').value;
   ui.editRef = { s: svc.id, p: p.id };
+  ui.editCid = '';
   if (!keepFields) { $('#fName').value = svc.name; $('#fCat').value = svc.cat; }
   $('#fPlan').value = p.name;
   $('#fPrice').value = p.price;
@@ -1959,14 +1989,17 @@ function readForm() {
   const trialEnd = $('#fTrialEnd').value;
   if (status === 'trial' && trialEnd && !isISO(trialEnd)) return err('無料体験の終了日が正しくありません。');
   $('#formErr').hidden = true;
-  return { name, plan: $('#fPlan').value.trim(), cat: $('#fCat').value, price, cur: $('#fCur').value, cycle: $('#fCycle').value, anchor, status, trialEnd: status === 'trial' ? trialEnd : '', usage: ui.usage, method: $('#fMethod').value.trim(), share: clampInt($('#fShare').value, 1, 20, 1), note: $('#fNote').value.trim(), ref: ui.editRef };
+  return { name, plan: $('#fPlan').value.trim(), cat: $('#fCat').value, price, cur: $('#fCur').value, cycle: $('#fCycle').value, anchor, status, trialEnd: status === 'trial' ? trialEnd : '', usage: ui.usage, method: $('#fMethod').value.trim(), share: clampInt($('#fShare').value, 1, 20, 1), note: $('#fNote').value.trim(), ref: ui.editRef, cid: ui.editCid || '' };
 }
 function saveEdit() {
   const data = readForm();
   if (!data) return;
   const cp = catalogPlan(data.ref);
   const ign = cp && (cp.plan.currency || 'JPY') === data.cur && cp.plan.c === data.cycle && Math.abs(cp.plan.price - data.price) >= 0.005 ? cp.plan.price : null;
-  let clearedSample = false;
+  const wantPublish = FB_ON && !data.ref && !data.cid && $('#fPublish').checked;
+  const inCatalog = wantPublish && CATALOG.services.some(v => normQ(v.name) === normQ(data.name));
+  const isNew = !ui.editId;
+  let clearedSample = false, subId = ui.editId;
   commit(() => {
     const ex = ui.editId && state.subs.find(s => s.id === ui.editId);
     if (ex) {
@@ -1977,11 +2010,25 @@ function saveEdit() {
       touch(ex);
     } else {
       if (state.subs.some(s => s.sample)) { clearSamples(); clearedSample = true; }
-      state.subs.push(normSub(Object.assign({}, data, { id: uid(), createdAt: new Date().toISOString(), updatedAt: now(), ignoredPrice: ign, cancelledAt: data.status === 'cancelled' ? fmtD(today()) : '' })));
+      const ns = normSub(Object.assign({}, data, { id: uid(), createdAt: new Date().toISOString(), updatedAt: now(), ignoredPrice: ign, cancelledAt: data.status === 'cancelled' ? fmtD(today()) : '' }));
+      subId = ns.id;
+      state.subs.push(ns);
     }
   });
   closeEdit();
   toast(clearedSample ? '保存しました（サンプルは片付けました）' : '保存しました');
+  if (!FB_ON) return;
+  if (data.ref) rankCatchUp();
+  else if (data.cid && isNew) countCommunity(data.cid);
+  else if (inCatalog) toast('一覧にあるサービスなので、「みんなのサブスク」には公開しませんでした');
+  else if (wantPublish) {
+    publishCommunity(data).then(id => {
+      if (!id) return;
+      const s = findSub(subId);
+      commit(() => { if (s) { s.cid = id; touch(s); } markRanked('c:' + id); });
+      toast('「みんなのサブスク」に公開しました');
+    }).catch(() => toast('公開できませんでした。通信を確認して、もう一度「公開する」を選んで保存してください', 'crit'));
+  }
 }
 
 /* ───────── 確認・パスコード入力 ───────── */
@@ -2000,7 +2047,7 @@ function ask({ title, body = '', ok = 'OK', danger = false, pass = 0 }) {
   $('#askErr').hidden = true;
   askDlg.dataset.pass = String(pass || '');
   if (askResolve) { const r = askResolve; askResolve = null; r(null); }
-  askDlg.showModal();
+  showDlg(askDlg);
   if (pass && finePointer()) setTimeout(() => $('#askPass1').focus(), 30);
   return new Promise(res => { askResolve = res; });
 }
@@ -2015,9 +2062,9 @@ $('#askForm').addEventListener('submit', e => {
     if (mode === '2' && p1 !== p2) return fail('2回の入力が一致しません。');
     val = p1;
   }
-  const r = askResolve; askResolve = null; askDlg.close(); r && r(val);
+  const r = askResolve; askResolve = null; closeDlg(askDlg); r && r(val);
 });
-$('#askCancel').addEventListener('click', () => askDlg.close());
+$('#askCancel').addEventListener('click', () => closeDlg(askDlg));
 askDlg.addEventListener('close', () => { if (askResolve) { const r = askResolve; askResolve = null; r(null); } });
 
 /* ───────── ファイルの書き出し ───────── */
@@ -2043,19 +2090,38 @@ async function offerFile(filename, data, textFallback) {
     return true;
   }
   if (typeof textFallback === 'string') {
-    $('#textName').textContent = filename.replace(/\.zip$/, '');
-    $('#textDump').value = textFallback;
-    $('#textDlg').showModal();
+    showText('内容をコピーして保存', `この画面ではファイルを直接保存できませんでした。下の内容をコピーして、メモ帳などに貼り付けて「${filename.replace(/\.zip$/, '')}」という名前で保存してください。`, textFallback);
     return true;
   }
   toast('この画面ではファイルを保存できませんでした', 'crit');
   return false;
 }
-async function exportJSON() {
-  const payload = session
+async function backupPayload() {
+  return session
     ? Object.assign({ app: 'subsc-tsucho', exportedAt: new Date().toISOString() }, await seal(state, session))
     : { app: 'subsc-tsucho', v: 2, exportedAt: new Date().toISOString(), enc: false, data: state };
-  const text = JSON.stringify(payload, null, 2);
+}
+function showText(title, desc, text) {
+  $('#textTitle').textContent = title;
+  $('#textDesc').textContent = desc;
+  $('#textDump').value = text;
+  showDlg($('#textDlg'));
+}
+// クリック直後に呼ぶ。中身が後からできる場合も、iPhone の Safari でコピーできるように ClipboardItem に約束（Promise）で渡す
+async function copyText(src, msg) {
+  const textP = Promise.resolve(src);
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      await navigator.clipboard.write([new ClipboardItem({ 'text/plain': textP.then(t => new Blob([t], { type: 'text/plain' })) })]);
+      toast(msg); return true;
+    }
+  } catch {}
+  try { await navigator.clipboard.writeText(await textP); toast(msg); return true; } catch {}
+  showText('コピーしてください', 'この画面では自動でコピーできませんでした。下の内容をすべて選んでコピーしてください。', await textP);
+  return false;
+}
+async function exportJSON() {
+  const text = JSON.stringify(await backupPayload(), null, 2);
   const ok = await offerFile(`subsc-backup-${fmtD(today())}.json`, text, text);
   if (ok) { commit(() => { state.settings.lastBackup = fmtD(today()); touchSettings(); }); toast('バックアップを書き出しました'); }
 }
@@ -2129,28 +2195,43 @@ async function exportICS() {
   if (ok) toast('カレンダー用ファイルを書き出しました');
 }
 
-/* ───────── 読み込み ───────── */
+/* ───────── 読み込み（バックアップファイル・貼り付け・引き継ぎコード） ───────── */
 async function importFile(file) {
   if (!file) return;
   if (file.size > 5 * 1024 * 1024) { toast('ファイルが大きすぎます', 'crit'); return; }
   let obj;
   try { obj = JSON.parse(await file.text()); } catch { toast('バックアップファイルとして読めませんでした', 'crit'); return; }
+  await importObject(obj, 'replace');
+}
+async function importObject(obj, how) {
   let data = null, sess = null;
   if (obj && obj.enc === true) {
-    if (!cryptoOK) { toast('このブラウザでは暗号化されたバックアップを開けません', 'crit'); return; }
-    const pass = await ask({ title: 'バックアップのパスコード', body: 'このバックアップは暗号化されています。書き出したときのパスコードを入力してください。', ok: '開く', pass: 1 });
-    if (!pass) return;
-    try { ({ data, sess } = await unseal(obj, pass)); } catch { toast('パスコードが違うか、ファイルが壊れています', 'crit'); return; }
+    if (!cryptoOK) { toast('このブラウザでは暗号化されたデータを開けません', 'crit'); return false; }
+    const pass = await ask({ title: 'パスコードを入力', body: 'このデータはパスコードで暗号化されています。元の画面で使っているパスコードを入力してください。', ok: '開く', pass: 1 });
+    if (!pass) return false;
+    try { ({ data, sess } = await unseal(obj, pass)); } catch { toast('パスコードが違うか、データが壊れています', 'crit'); return false; }
   } else if (obj && obj.data && Array.isArray(obj.data.subs)) data = obj.data;
-  else { toast('サブスク通帳のバックアップではないようです', 'crit'); return; }
+  else { toast('サブスク通帳のデータではないようです', 'crit'); return false; }
   const next = normalize(data);
-  const okd = await ask({ title: 'バックアップを読み込みますか？', body: `${next.subs.length}件のサブスクが入っています。${device.sync ? 'いまのデータと合わせ、同期中のほかの端末にも反映します。' : 'いまこのブラウザにあるデータは置き換わります。'}`, ok: '読み込む', danger: !device.sync });
-  if (!okd) return;
+  next.subs = next.subs.filter(s => !s.sample);
+  return applyImport(next, how, sess);
+}
+// how: 'replace' = いまのデータを置き換える（バックアップ） / 'merge' = 合わせる（引き継ぎ・貼り付け）
+async function applyImport(next, how, sess) {
+  const hasMine = state.subs.some(s => !s.sample);
+  const transfer = how === 'merge', merge = transfer && hasMine;
+  const okd = await ask({
+    title: transfer ? 'データを引き継ぎますか？' : 'バックアップを読み込みますか？',
+    body: `${next.subs.length}件のサブスクが入っています。` + (merge ? 'この画面にあるデータは残し、同じサブスクは引き継いだ内容にそろえます。' : hasMine ? 'いまこのブラウザにあるデータは置き換わります。' : ''),
+    ok: transfer ? '引き継ぐ' : '読み込む', danger: !merge && hasMine
+  });
+  if (!okd) return false;
   if (sess && !session) session = sess;
   const t = now();
   for (const s of next.subs) s.updatedAt = Math.max(s.updatedAt || 0, t);
-  commit(() => { state = device.sync ? mergeStates(state, next) : next; });
-  toast(`${next.subs.length}件を読み込みました`);
+  commit(() => { state = merge ? mergeStates(state, next) : next; });
+  toast(`${next.subs.length}件を${transfer ? '引き継ぎ' : '読み込み'}ました`);
+  return true;
 }
 
 /* ───────── ロック ───────── */
@@ -2160,7 +2241,7 @@ function showLock() {
   $('#lockErr').hidden = true;
   $('#lockForgotBox').hidden = true;
   $('#lockPass').value = '';
-  if (editDlg.open) editDlg.close();
+  closeDlg(editDlg);
   setTimeout(() => $('#lockPass').focus(), 30);
 }
 $('#lockForm').addEventListener('submit', async e => {
@@ -2173,7 +2254,7 @@ $('#lockForm').addEventListener('submit', async e => {
     if (device.lockOnOpen === null) { device.lockOnOpen = true; saveDevice(); }
     lockScreen.hidden = true;
     render();
-    if (device.sync && sync.ref) startSync();
+    rankCatchUp();
   } catch {
     $('#lockErr').textContent = 'パスコードが違います。';
     $('#lockErr').hidden = false;
@@ -2184,7 +2265,7 @@ $('#lockWipe').addEventListener('click', async e => {
   const b = e.currentTarget;
   if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'もう一度押すと消去します（元に戻せません）'; return; }
   removeRaw(); await idbDel('main');
-  session = null; pendingEnc = null; device.sync = false; device.lockOnOpen = null; saveDevice();
+  session = null; pendingEnc = null; device.lockOnOpen = null; saveDevice();
   state = normalize({}); lockScreen.hidden = true; render(); toast('この端末のデータを消去しました');
 });
 async function lockNow() {
@@ -2193,7 +2274,6 @@ async function lockNow() {
   let raw = null;
   try { raw = JSON.parse(readRaw()); } catch {}
   if (!raw || !raw.enc) { toast('ロックできませんでした（保存に失敗しています）', 'crit'); return; }
-  stopSync();
   pendingEnc = raw; session = null; state = null;
   showLock();
 }
@@ -2207,7 +2287,7 @@ const actions = {
   compare: el => openEdit(el.dataset.id, { compare: true }),
   'close-edit': () => closeEdit(),
   goto: el => setTab(el.dataset.to),
-  'goto-sync': () => { setTab('settings'); window.scrollTo({ top: 0 }); },
+  'goto-transfer': () => { setTab('settings'); requestAnimationFrame(() => $('#transferCard').scrollIntoView({ block: 'start' })); },
   'toggle-hide': () => { device.hideAmounts = !device.hideAmounts; saveDevice(); render(); },
   'clear-sample': () => { commit(clearSamples); toast('サンプルを消しました'); },
   dismiss: el => commit(() => { state.settings.dismissed[el.dataset.key] = true; touchSettings(); }),
@@ -2230,8 +2310,8 @@ const actions = {
     commit(() => { state.subs = state.subs.filter(s => s.id !== id); state.tomb[id] = now(); });
     closeEdit(); toast('削除しました');
   },
-  repick: () => { ui.editRef = null; $('#picker').hidden = false; renderPicked(); renderCompare(); renderEditLinks(); if (finePointer()) $('#pickQ').focus(); },
-  unlink: () => { ui.editRef = null; renderPicked(); renderCompare(); renderEditLinks(); if (!ui.editId) $('#picker').hidden = false; },
+  repick: () => { ui.editRef = null; ui.editCid = ''; $('#picker').hidden = false; renderPicked(); renderCompare(); renderEditLinks(); if (finePointer()) $('#pickQ').focus(); },
+  unlink: () => { ui.editRef = null; ui.editCid = ''; renderPicked(); renderCompare(); renderEditLinks(); if (!ui.editId) $('#picker').hidden = false; },
   'cal-prev': () => { const b = ui.cal || new Date(today().getFullYear(), today().getMonth(), 1); ui.cal = new Date(b.getFullYear(), b.getMonth() - 1, 1); renderCalendar(); },
   'cal-next': () => { const b = ui.cal || new Date(today().getFullYear(), today().getMonth(), 1); ui.cal = new Date(b.getFullYear(), b.getMonth() + 1, 1); renderCalendar(); },
   'cal-today': () => { ui.cal = null; renderCalendar(); },
@@ -2240,46 +2320,70 @@ const actions = {
   'export-ics': () => exportICS(),
   'import-json': () => $('#importFile').click(),
   'fx-reset': () => commit(() => { state.settings.fxUSD = null; touchSettings(); }),
-  'begin-sync': async () => { const m = await beginSync(); if (m) toast(m, 'crit'); },
-  'gist-disconnect': async () => {
-    if (!(await ask({ title: 'GitHub との接続を解除しますか？', body: 'この端末に保存したトークンを消し、この端末の同期を止めます。Gist の同期データとこの端末のデータは残ります。', ok: '解除する' }))) return;
-    stopSync(); device.sync = false; device.gistToken = ''; device.gistId = ''; saveDevice();
-    sync.ref = null; sync.avail = 'needtoken'; sync.remoteExists = false; sync.hadRemote = false; sync.err = '';
-    render(); toast('GitHub との接続を解除しました');
-  },
-  'join-sync': () => goSync('joinForm'),
-  repass: () => goSync('repassForm'),
-  'retry-sync': () => { sync.status = 'ok'; sync.remoteJSON = ''; if (!sync.unsub) startSync(); schedulePush(0); render(); },
-  'stop-sync': async () => {
-    if (!(await ask({ title: 'この端末の同期を止めますか？', body: 'この端末のデータはそのまま残ります。同期の保存場所とほかの端末のデータも消えません。', ok: '止める' }))) return;
-    stopSync(); device.sync = false; saveDevice(); sync.remoteExists = true; render(); toast('この端末の同期を止めました');
-  },
-  'delete-cloud': async () => {
-    if (!(await ask({ title: '同期の保存場所からデータを消しますか？', body: 'クラウド側の暗号化データを削除し、すべての端末の同期を止めます。各端末のブラウザに保存されたデータは残ります。', ok: '消す', danger: true }))) return;
-    try { await sync.ref.delete(); } catch { toast('削除できませんでした', 'crit'); return; }
-    stopSync(); device.sync = false; saveDevice(); sync.remoteExists = false; sync.hadRemote = false; sync.lastCt = ''; render(); toast('同期の保存場所から削除しました');
-  },
   'set-lock': async () => {
-    const pass = await ask({ title: session ? '新しいパスコード' : 'パスコードを設定', body: device.sync ? '同期中のほかの端末では、次に開いたときに新しいパスコードの入力が必要になります。' : '忘れるとデータを取り出せなくなります。先にバックアップを書き出しておくと安心です。', ok: '設定する', pass: 2 });
+    const pass = await ask({ title: session ? '新しいパスコード' : 'パスコードを設定', body: '忘れると、このブラウザのデータを取り出せなくなります（再発行はできません）。先にバックアップを書き出しておくと安心です。', ok: '設定する', pass: 2 });
     if (!pass) return;
     const first = !session;
     session = await newSession(pass);
     if (first && device.lockOnOpen === null) device.lockOnOpen = true;
     saveDevice();
     await rememberKey();
-    sync.remoteJSON = '';
     commit(() => {});
     toast('パスコードを設定しました');
   },
   'remove-lock': async () => {
-    if (device.sync) return;
     if (!(await ask({ title: 'パスコードをやめますか？', body: 'この端末に保存するデータの暗号化をやめ、パスコードなしで開けるようにします。', ok: 'やめる', danger: true }))) return;
     session = null; device.lockOnOpen = null; saveDevice(); await idbDel('main'); commit(() => {}); toast('パスコードをやめました');
   },
   'lock-now': () => lockNow(),
+  'transfer-create': async () => {
+    if (!state.subs.some(s => !s.sample)) { toast('引き継ぐサブスクがまだありません'); return; }
+    online.transferBusy = true; renderTransfer();
+    try { online.transfer = await createTransfer(); }
+    catch (e) { toast(e && e.status === 0 ? '通信できませんでした。電波のよいところでもう一度お試しください' : 'コードを発行できませんでした。少し待ってからお試しください', 'crit'); }
+    online.transferBusy = false; renderTransfer();
+  },
+  'transfer-copy': () => { if (online.transfer) copyText(fmtCode(online.transfer.code), 'コードをコピーしました'); },
+  'transfer-cancel': async () => {
+    const t = online.transfer;
+    if (!t) return;
+    online.transfer = null; renderTransfer();
+    try { await fb('/transfer/' + await transferId(t.code), 'DELETE'); toast('コードを取り消しました'); }
+    catch { toast('取り消しを送れませんでした（24時間たつと自動で使えなくなります）'); }
+  },
+  'copy-data': () => {
+    if (!state.subs.some(s => !s.sample)) { toast('コピーするサブスクがまだありません'); return; }
+    copyText(backupPayload().then(p => JSON.stringify(p)), session ? 'コピーしました（パスコードで暗号化済み）。移した先の画面で貼り付けてください' : 'コピーしました。移した先の画面で貼り付けてください');
+  },
+  'paste-import': async () => {
+    const box = $('#pasteBox'), text = box.value.trim();
+    if (!text) { toast('先に、コピーしたデータを欄に貼り付けてください'); if (finePointer()) box.focus(); return; }
+    let obj;
+    try { obj = JSON.parse(text); } catch { toast('データとして読めませんでした。最後まで貼り付けられているか確かめてください', 'crit'); return; }
+    if (await importObject(obj, 'merge')) box.value = '';
+  },
+  'share-app': async () => {
+    if (!APP_URL) { toast('この画面ではリンクを作れません'); return; }
+    if (navigator.share) {
+      try { await navigator.share({ title: 'サブスク通帳', text: 'サブスクの支払日・学割・卒業後の料金をまとめて管理できるアプリ', url: APP_URL }); return; }
+      catch (e) { if (e && e.name === 'AbortError') return; }
+    }
+    copyText(APP_URL, 'リンクをコピーしました');
+  },
+  'pick-more': () => { ui.pick.more = true; renderPicker(); },
+  'open-community': () => openEdit(null, { cat: 'community' }),
+  'add-community': el => { openEdit(null); pickCommunity(el.dataset.cid); },
+  'report-community': async () => {
+    const c = online.community.find(x => x.id === ui.editCid);
+    if (!c) return;
+    if (state.settings.ranked.includes('r:' + c.id)) { toast('このサブスクはもう報告済みです'); return; }
+    if (!(await ask({ title: `「${c.name}」を報告しますか？`, body: '名前が不適切・内容がでたらめなどのときに使ってください。何人かが報告すると、一覧に出なくなります。', ok: '報告する', danger: true }))) return;
+    try { await fbIncrement('community/' + c.id, 'reports'); commit(() => markRanked('r:' + c.id)); toast('報告しました。ありがとうございます'); }
+    catch { toast('送信できませんでした。通信を確認してください', 'crit'); }
+  },
   'clear-all': async () => {
     if (!(await ask({ title: 'このブラウザのデータを削除しますか？', body: 'このブラウザに保存したサブスクと設定を消します。元に戻せません。', ok: '削除する', danger: true }))) return;
-    stopSync(); session = null; device.sync = false; device.lockOnOpen = null; saveDevice(); await idbDel('main');
+    session = null; device.lockOnOpen = null; online.transfer = null; saveDevice(); await idbDel('main');
     removeRaw(); state = normalize({}); render(); toast('このブラウザのデータを削除しました');
   }
 };
@@ -2289,7 +2393,9 @@ document.addEventListener('click', e => {
   const el = e.target.closest('[data-action]');
   if (el && actions[el.dataset.action] && state) { e.preventDefault(); actions[el.dataset.action](el); return; }
   const chip = e.target.closest('[data-pickcat]');
-  if (chip) { ui.pick.cat = chip.dataset.pickcat; renderPicker(); return; }
+  if (chip) { ui.pick.cat = chip.dataset.pickcat; ui.pick.more = false; renderPicker(); return; }
+  const commBtn = e.target.closest('[data-comm]');
+  if (commBtn) { pickCommunity(commBtn.dataset.comm); return; }
   const svcBtn = e.target.closest('[data-svc]');
   if (svcBtn) { ui.pick.svc = ui.pick.svc === svcBtn.dataset.svc ? null : svcBtn.dataset.svc; renderPicker(); const pp = $('#pickPlans'); if (!pp.hidden) pp.scrollIntoView({ block: 'nearest' }); return; }
   const plan = e.target.closest('[data-plan]');
@@ -2300,38 +2406,40 @@ document.addEventListener('click', e => {
   if (usage) setUsage(usage.dataset.usage);
 });
 document.addEventListener('change', async e => {
+  if (e.target.id === 'sRank') {
+    const on = e.target.checked;
+    commit(() => { state.settings.rank = on; touchSettings(); });
+    if (on) rankCatchUp();
+    toast(on ? '人気ランキングに参加します' : '人気ランキングへの参加をやめました');
+    return;
+  }
   if (e.target.id === 'sLockOpen') { device.lockOnOpen = e.target.checked; saveDevice(); await rememberKey(); render(); toast(device.lockOnOpen ? '次に開くときからパスコードを求めます' : 'この端末ではパスコードを記憶します'); }
 });
 $('#editForm').addEventListener('submit', e => { e.preventDefault(); saveEdit(); });
 document.addEventListener('submit', async e => {
   const f = e.target;
-  if (!['joinForm', 'beginForm', 'repassForm', 'gistForm'].includes(f.id)) return;
+  if (f.id !== 'transferForm') return;
   e.preventDefault();
+  if (!state || !FB_ON) return;
   const err = f.querySelector('.err'), btn = f.querySelector('button[type="submit"]');
-  const p1 = f.elements.p1.value, p2 = f.elements.p2 ? f.elements.p2.value : p1;
   const fail = m => { err.textContent = m; err.hidden = false; };
-  if (f.id === 'gistForm') {
-    if (p1.trim().length < 20) return fail('トークンを貼り付けてください。');
-  } else {
-    if (p1.length < 4) return fail('4文字以上で入力してください。');
-    if (p1 !== p2) return fail('2回の入力が一致しません。');
-  }
-  const label = btn.textContent;
   btn.disabled = true; btn.textContent = '確認中…'; err.hidden = true;
   if (document.activeElement) document.activeElement.blur();
-  let m = '';
-  try { m = f.id === 'gistForm' ? await connectGist(p1) : f.id === 'joinForm' ? await joinSync(p1) : f.id === 'beginForm' ? await beginSync(p1) : await repass(p1); }
-  catch { m = 'うまくいきませんでした。もう一度お試しください。'; }
-  if (!m) return;
-  if (document.body.contains(f)) { btn.disabled = false; btn.textContent = label; fail(m); }
-  else toast(m, 'crit');
+  let r;
+  try { r = await receiveTransfer(f.elements.code.value); } catch { r = { err: 'うまくいきませんでした。もう一度お試しください。' }; }
+  btn.disabled = false; btn.textContent = '引き継ぐ';
+  if (r.err) { fail(r.err); return; }
+  const next = normalize(r.data);
+  next.subs = next.subs.filter(s => !s.sample);
+  if (await applyImport(next, 'merge')) { f.reset(); fb('/transfer/' + r.id, 'DELETE').catch(() => {}); }
 });
 // 暗い背景をタップしたら閉じる（窓が何かの理由で見えなくても、画面が固まらないように）
 for (const d of document.querySelectorAll('dialog')) {
+  d.addEventListener('close', () => releaseDlg(d));
   d.addEventListener('click', e => {
     if (e.target !== d) return;
     const r = d.getBoundingClientRect();
-    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) d.close();
+    if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) closeDlg(d);
   });
 }
 // スマホのキーボードが出たときも、ダイアログを見えている範囲に収める
@@ -2343,7 +2451,7 @@ if (window.visualViewport) {
 $('#fStatus').addEventListener('change', () => { syncTrial(); if ($('#fStatus').value === 'trial' && !$('#fTrialEnd').value) $('#fTrialEnd').value = $('#fAnchor').value; });
 $('#fTrialEnd').addEventListener('change', () => { if ($('#fStatus').value === 'trial' && isISO($('#fTrialEnd').value)) $('#fAnchor').value = $('#fTrialEnd').value; });
 for (const id of ['#fPrice', '#fCur', '#fCycle', '#fShare']) $(id).addEventListener('input', () => { if (!$('#compare').hidden) renderCompare(); });
-$('#pickQ').addEventListener('input', e => { ui.pick.q = e.target.value; ui.pick.svc = null; renderPicker(); });
+$('#pickQ').addEventListener('input', e => { ui.pick.q = e.target.value; ui.pick.svc = null; ui.pick.more = false; renderPicker(); });
 for (const id of ['#lq', '#lf', '#ls']) $(id).addEventListener('input', () => state && renderList());
 $('#sBudget').addEventListener('change', e => commit(() => { state.settings.budget = Math.max(0, Math.round(Number(e.target.value) || 0)); state.settings.sampleBudget = false; touchSettings(); }));
 $('#sFx').addEventListener('change', e => { const v = Number(e.target.value); commit(() => { state.settings.fxUSD = v > 0 ? v : null; touchSettings(); }); });
@@ -2351,7 +2459,7 @@ $('#sHide').addEventListener('change', e => { device.hideAmounts = e.target.chec
 $('#sStudent').addEventListener('change', e => commit(() => { state.settings.student = e.target.checked; touchSettings(); }));
 $('#sGrad').addEventListener('change', e => { const v = e.target.value; commit(() => { state.settings.gradMonth = isYM(v) ? v : ''; state.settings.sampleBudget = false; touchSettings(); }); });
 $('#importFile').addEventListener('change', e => { const f = e.target.files && e.target.files[0]; e.target.value = ''; importFile(f); });
-$('#textClose').addEventListener('click', () => $('#textDlg').close());
+$('#textClose').addEventListener('click', () => closeDlg($('#textDlg')));
 $('#textCopy').addEventListener('click', () => {
   const ta = $('#textDump');
   const fallback = () => { ta.select(); toast('選択しました。Ctrl+C（⌘+C）でコピーしてください'); };
@@ -2368,8 +2476,10 @@ function toast(msg, level = '') {
 
 /* ───────── 起動 ───────── */
 async function boot() {
-  sync.kind = IN_CLAUDE ? 'claude' : 'gist';
   fillSelects();
+  for (const el of document.querySelectorAll('.needs-online')) el.hidden = !FB_ON;
+  for (const el of document.querySelectorAll('.no-online')) el.hidden = FB_ON;
+  if (!FB_ON) $('#manualTransfer').open = true;
   let startTab = 'overview';
   try { startTab = localStorage.getItem(TAB_KEY) || startTab; } catch {}
   const h = (location.hash || '').slice(1);
@@ -2388,8 +2498,8 @@ async function boot() {
     if (!state) { pendingEnc = stored; showLock(); }
   } else if (stored && stored.data) state = normalize(stored.data);
   else state = sampleState();
-  if (state) render();
-  initSync();
+  if (state) { render(); rankCatchUp(); }
+  loadOnline();
 }
 boot();
 })();

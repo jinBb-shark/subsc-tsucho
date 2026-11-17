@@ -1,0 +1,63 @@
+rules_version = '2';
+
+// サブスク通帳の Firestore ルール。
+// Firebase コンソールの［Firestore Database］→［ルール］に、このファイルの中身をそのまま貼り付けて「公開」してください。
+// ログインなしで使うため、決まった形の読み書きだけを許可しています。
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // みんなのサブスク: 一覧にないサブスクを、名前・カテゴリ・金額・支払い周期だけ公開したもの
+    match /community/{id} {
+      allow read: if true;
+      allow create: if id.matches('^[A-Za-z0-9]{8,40}$')
+        && request.resource.data.keys().hasOnly(['name', 'key', 'cat', 'price', 'currency', 'cycle', 'adds', 'reports', 'createdAt'])
+        && request.resource.data.keys().hasAll(['name', 'key', 'cat', 'price', 'currency', 'cycle', 'adds', 'reports', 'createdAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0 && request.resource.data.name.size() <= 60
+        && request.resource.data.key is string
+        && request.resource.data.key.size() > 0 && request.resource.data.key.size() <= 80
+        && request.resource.data.cat in ['video', 'music', 'books', 'study', 'software', 'ai', 'game', 'social', 'cloud', 'telecom', 'membership', 'life', 'delivery', 'fitness', 'other']
+        && request.resource.data.price is number
+        && request.resource.data.price >= 0 && request.resource.data.price <= 1000000
+        && request.resource.data.currency in ['JPY', 'USD']
+        && request.resource.data.cycle in ['1w', '2w', '4w', '30d', '1m', '6w', '2m', '3m', '6m', '1y', '2y']
+        && request.resource.data.adds == 1
+        && request.resource.data.reports == 0
+        && request.resource.data.createdAt == request.time;
+      // 変えられるのは「追加した人数」と「報告の数」を1つ増やすことだけ
+      allow update: if (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['adds'])
+          && request.resource.data.adds == resource.data.adds + 1)
+        || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reports'])
+          && request.resource.data.reports == resource.data.reports + 1);
+      allow delete: if false;
+    }
+
+    // 人気ランキング: 収録サービスの id ごとに、追加した人の数だけを数える
+    match /popularity/{svc} {
+      allow read: if true;
+      allow create: if svc.matches('^[a-z0-9-]{1,40}$')
+        && request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == 1;
+      allow update: if request.resource.data.keys().hasOnly(['count'])
+        && request.resource.data.count == resource.data.count + 1;
+      allow delete: if false;
+    }
+
+    // 引き継ぎコード: コードで暗号化したデータを24時間だけ預ける。
+    // 文書名はコードのハッシュなので、一覧は取れないようにして、コードを知っている人だけが読めるようにする
+    match /transfer/{id} {
+      allow get: if resource == null || resource.data.expireAt > request.time;
+      allow list: if false;
+      allow create: if id.matches('^[a-f0-9]{32}$')
+        && request.resource.data.keys().hasOnly(['salt', 'iv', 'ct', 'iter', 'expireAt'])
+        && request.resource.data.salt is string && request.resource.data.salt.size() <= 64
+        && request.resource.data.iv is string && request.resource.data.iv.size() <= 64
+        && request.resource.data.ct is string && request.resource.data.ct.size() <= 700000
+        && request.resource.data.iter is int
+        && request.resource.data.expireAt is timestamp
+        && request.resource.data.expireAt <= request.time + duration.value(25, 'h');
+      allow update: if false;
+      allow delete: if true;
+    }
+  }
+}
