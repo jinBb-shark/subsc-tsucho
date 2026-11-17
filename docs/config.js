@@ -9,7 +9,7 @@
 window.SUBSC_CONFIG = {
   appUrl: "https://jinbb-shark.github.io/subsc-tsucho/",
   firebase: {
-    apiKey: "",
-    projectId: ""
+    apiKey: "AIzaSyD8gwQdzxVqVL7HGXqr-G5wMnZImDewPsk",
+    projectId: "subsc-tsucho"
   }
 };
