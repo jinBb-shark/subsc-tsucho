@@ -17,8 +17,8 @@
  *   - cat: video, music, books, study, software, ai, game, social, cloud, telecom, membership, life, delivery（定期便・宅配）, fitness（健康・美容・コンタクト）, other
  */
 window.SUBSCRIPTION_CATALOG = {
-  version: "2026-11-17",
-  fx: { USD: 158, asOf: "2026-10-30", note: "日銀為替市況 10月30日午後5時（157円55〜56銭、みんかぶ）を丸めた値" },
+  version: "2026-11-18",
+  fx: { USD: 159, asOf: "2026-11-17", note: "11月17日東京終値 159.44円（OANDA マーケットニュース）を丸めた値" },
   services: [
     // ───────── 動画配信 ─────────
     { id: "netflix", name: "Netflix", kana: "ねっとふりっくす ねとふり", cat: "video",
@@ -329,7 +329,7 @@ window.SUBSCRIPTION_CATALOG = {
       site: "https://www.deepl.com/ja/pro",
       ref: "https://aipicks.jp/tool/deepl/pricing",
       checked: "2026-10-27", confidence: "low", note: "年払いの価格（月あたり1,150円）",
-      plans: [{ id: "starter-y", name: "Starter（年払い）", price: 13800, c: "1y" }] },
+      plans: [{ id: "starter-y", name: "Starter（年払い）", price: 13800, c: "1y", note: "新規受付は終了した模様（後継はIndividual、円の価格は未確認）" }] },
     { id: "grammarly", name: "Grammarly Pro", kana: "ぐらまりー", cat: "software",
       site: "https://www.grammarly.com/plans",
       ref: "https://www.eesel.ai/ja/blog/grammarly-ryokin",
@@ -461,11 +461,15 @@ window.SUBSCRIPTION_CATALOG = {
       ] },
     { id: "xpremium", name: "X Premium", kana: "えっくす ついったー", cat: "social",
       site: "https://help.x.com/ja/premium-plus-price-update",
-      ref: "https://jetstream.blog/?p=201070",
-      checked: "2026-10-27", confidence: "low", note: "2025年時点の価格。決済方法で変わる",
+      ref: "https://www.gamebusiness.jp/article/2026/10/14/28307.html",
+      checked: "2026-11-18", confidence: "mid", note: "2026年10月に新プラン（The X Subscription）へ刷新。Web決済の価格で、iPhoneアプリ内は割高",
       plans: [
-        { id: "premium", name: "プレミアム", price: 1270, c: "1m" },
-        { id: "premiumplus", name: "プレミアムプラス", price: 6080, c: "1m" }
+        { id: "premium", name: "プレミアム（旧プラン）", price: 1270, c: "1m", note: "新規受付終了。既存の契約は継続（切り替えると戻せない）" },
+        { id: "premiumplus", name: "プレミアムプラス（旧プラン）", price: 6080, c: "1m", note: "新規受付終了。既存の契約は継続" },
+        { id: "plus-m", name: "Plus（月額）", price: 1280, c: "1m", tier: "plus", note: "旧プレミアム相当" },
+        { id: "plus-y", name: "Plus（年額）", price: 12800, c: "1y", tier: "plus" },
+        { id: "premium2-m", name: "Premium（月額）", price: 5280, c: "1m", tier: "premium2", note: "旧プレミアムプラス相当" },
+        { id: "premium2-y", name: "Premium（年額）", price: 52800, c: "1y", tier: "premium2" }
       ] },
 
     // ───────── クラウド・ストレージ ─────────
@@ -491,7 +495,8 @@ window.SUBSCRIPTION_CATALOG = {
       ] },
     { id: "dropbox", name: "Dropbox", kana: "どろっぷぼっくす", cat: "cloud",
       site: "https://www.dropbox.com/ja/plans",
-      checked: "2026-10-27", confidence: "low", note: "2026年の価格は未確認",
+      ref: "https://www.luft.co.jp/media/dropbox-pricing-plans/",
+      checked: "2026-11-18", confidence: "mid", note: "2026年10月時点の比較記事で確認（年払いは月あたり1,200円）",
       plans: [
         { id: "plus-m", name: "Plus（月額）", price: 1500, c: "1m", tier: "plus" },
         { id: "plus-y", name: "Plus（年額）", price: 14400, c: "1y", tier: "plus" }
@@ -607,8 +612,12 @@ window.SUBSCRIPTION_CATALOG = {
       ] },
     { id: "timescar", name: "タイムズカー", kana: "たいむずかー かーしぇあ", cat: "life",
       site: "https://share.timescar.jp/",
-      checked: "2026-10-27", confidence: "low", note: "月額基本料。利用料金は別で、基本料分の利用料が含まれる",
-      plans: [{ id: "basic", name: "月額基本料", price: 880, c: "1m" }] },
+      ref: "https://share.timescar.jp/tcp_guide/join.html",
+      checked: "2026-11-18", confidence: "high", note: "月額基本料。利用料金は別で、基本料分の利用料が含まれる",
+      plans: [
+        { id: "basic", name: "月額基本料", price: 880, c: "1m" },
+        { id: "student", name: "学生プラン", price: 0, c: "1m", cond: "学生", after: "basic", note: "入会から4年間は月額基本料が無料" }
+      ] },
 
     // ───────── 健康・フィットネス ─────────
     { id: "chocozap", name: "chocoZAP", kana: "ちょこざっぷ らいざっぷ", cat: "fitness",
@@ -626,9 +635,9 @@ window.SUBSCRIPTION_CATALOG = {
       ] },
     { id: "wuwa", name: "鳴潮", kana: "めいちょう wuthering waves", cat: "game",
       site: "https://wutheringwaves.kurogames.com/jp/",
-      ref: "https://www.topuplive.com/ja/news/wuthering-waves-weekly-subscription.html",
-      checked: "2026-11-14", confidence: "low", note: "定価は4.99ドル。日本の価格はストアで確認を",
-      plans: [{ id: "lunite", name: "月相観測カード（30日）", price: 610, c: "30d" }] },
+      ref: "https://buffget.com/ja/news/wuthering-waves-lunite-vs-astrite-80-pull-pity-cost-2026",
+      checked: "2026-11-18", confidence: "mid", note: "30日ごとの購入（自動更新ではない）。複数の攻略サイトで610円",
+      plans: [{ id: "lunite", name: "月相観測パス（30日）", price: 610, c: "30d" }] },
     { id: "pokepoke", name: "ポケポケ（ポケモンTCGポケット）", kana: "ぽけぽけ ぽけもんかーど", cat: "game",
       site: "https://www.pokemon.co.jp/ex/pokemontcgpocket/",
       ref: "https://gamepedia.jp/pokemon-tcgp/archives/240",
