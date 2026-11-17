@@ -101,18 +101,18 @@ h2 { font-size: 15px; font-weight: 700; letter-spacing: .02em; }
 
 /* ── ボタン ── */
 .btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; border: 1px solid var(--rule-2); background: var(--sheet); color: var(--ink); padding: 8px 14px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; line-height: 1.3; transition: background .15s, border-color .15s, transform .1s; }
-.btn:hover { border-color: var(--ai-line); background: var(--ai-soft); }
+@media (hover: hover) { .btn:hover { border-color: var(--ai-line); background: var(--ai-soft); } }
 .btn:active { transform: translateY(1px); }
 .btn.primary { background: var(--ai); color: var(--ai-ink); border-color: var(--ai); }
-.btn.primary:hover { filter: brightness(1.08); }
+@media (hover: hover) { .btn.primary:hover { filter: brightness(1.08); } }
 .btn.danger { background: var(--crit); color: var(--crit-ink); border-color: var(--crit); }
 .btn.danger-ghost { color: var(--crit); border-color: transparent; background: none; }
-.btn.danger-ghost:hover { background: var(--crit-soft); }
+@media (hover: hover) { .btn.danger-ghost:hover { background: var(--crit-soft); } }
 .btn.sm { padding: 5px 10px; font-size: 13px; border-radius: 7px; }
 .btn.link { border: none; background: none; padding: 0; color: var(--ai); font-weight: 600; text-decoration: underline; text-underline-offset: 3px; }
 .btn[disabled] { opacity: .5; cursor: not-allowed; }
 .icon-btn { width: 38px; height: 38px; display: inline-grid; place-items: center; border-radius: 8px; border: 1px solid var(--rule-2); background: var(--sheet); color: var(--ink-2); cursor: pointer; }
-.icon-btn:hover { background: var(--ai-soft); color: var(--ink); }
+@media (hover: hover) { .icon-btn:hover { background: var(--ai-soft); color: var(--ink); } }
 .icon-btn[aria-pressed="true"] { background: var(--ai-soft); color: var(--ai); border-color: var(--ai-line); }
 .icon-btn svg { width: 18px; height: 18px; }
 .icon-btn.plain { border-color: transparent; background: none; }
@@ -249,7 +249,7 @@ main { padding-block: 18px calc(48px + var(--nav-h)); }
 .rows { background: var(--sheet); border: 1px solid var(--rule); border-radius: var(--r); overflow: hidden; }
 .row { width: 100%; display: grid; grid-template-columns: auto minmax(0, 1fr) auto 9.5em 8.5em; gap: 4px 14px; align-items: center; text-align: left; padding: 11px 14px; background: none; border: none; border-top: 1px solid var(--rule); cursor: pointer; transition: background .12s; }
 .row:first-child { border-top: none; }
-.row:hover { background: var(--ai-soft); }
+@media (hover: hover) { .row:hover { background: var(--ai-soft); } }
 .row-name { font-weight: 700; overflow-wrap: anywhere; min-width: 0; }
 .row-name small { display: block; font-weight: 400; color: var(--ink-3); font-size: 12.5px; }
 .row.cancelled .row-name { color: var(--ink-3); text-decoration: line-through; }
@@ -354,10 +354,12 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 .chips { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip { border: 1px solid var(--rule-2); background: var(--sheet); border-radius: 999px; padding: 3px 11px; font-size: 12.5px; cursor: pointer; }
 .chip[aria-pressed="true"] { background: var(--ai); color: var(--ai-ink); border-color: var(--ai); }
+.method-chips { gap: 5px; margin-top: 2px; }
+.method-chips .chip { font-size: 12px; padding: 3px 10px; }
 .svc-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px; padding: 2px; }
 .svc.more { justify-content: center; font-size: 13px; font-weight: 700; color: var(--ai); grid-column: 1 / -1; }
 .svc { border: 1px solid var(--rule); background: var(--sheet); border-radius: 8px; padding: 7px 9px; text-align: left; cursor: pointer; display: flex; gap: 8px; align-items: center; min-width: 0; }
-.svc:hover { border-color: var(--ai); }
+@media (hover: hover) { .svc:hover { border-color: var(--ai); } }
 .svc[aria-pressed="true"] { border-color: var(--ai); box-shadow: inset 0 0 0 1px var(--ai); }
 .svc-text { display: grid; min-width: 0; }
 .svc-name { font-weight: 700; font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -366,7 +368,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 .plans { display: grid; gap: 6px; }
 .plans-head { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; font-size: 13px; }
 .plan { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 9px 12px; border: 1px solid var(--rule-2); border-radius: 8px; background: var(--sheet); cursor: pointer; text-align: left; width: 100%; }
-.plan:hover { border-color: var(--ai); background: var(--ai-soft); }
+@media (hover: hover) { .plan:hover { border-color: var(--ai); background: var(--ai-soft); } }
 .plan b { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .plan-note { font-size: 12.5px; color: var(--ink-2); }
 .picked { display: flex; gap: 10px; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: 8px; background: var(--good-soft); font-size: 13.5px; flex-wrap: wrap; }
@@ -721,7 +723,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         <label class="f"><span>状態</span><select id="fStatus"></select></label>
         <label class="f" id="trialWrap"><span>無料体験の終了日</span><input id="fTrialEnd" type="date"><small>この日の前にお知らせします</small></label>
         <div class="f f-wide"><span class="lbl" id="usageLbl" style="margin:0">どのくらい使っている？</span><div class="seg" id="fUsage" role="radiogroup" aria-labelledby="usageLbl"></div><small>「ときどき」「ほぼ使わない」にすると、下位プランや解約の案を出します</small></div>
-        <label class="f"><span>支払い方法</span><input id="fMethod" maxlength="80" list="methodList" placeholder="例: キャリア決済 / PayPay" autocomplete="off"><small>呼び名だけ。カード番号は入力しないでください</small></label>
+        <div class="f"><label class="lbl" for="fMethod" style="margin:0">支払い方法</label><input id="fMethod" maxlength="80" placeholder="例: キャリア決済 / PayPay" autocomplete="off"><div class="chips method-chips" id="methodChips"></div><small>呼び名だけ。カード番号は入力しないでください</small></div>
         <label class="f"><span>分担する人数</span><input id="fShare" type="number" min="1" max="20" step="1" inputmode="numeric"><small>家族や友だちと割り勘なら人数（自分を含む）。自己負担額で集計します</small></label>
         <label class="f f-wide"><span>メモ</span><textarea id="fNote" rows="2" maxlength="1000" placeholder="例: 解約はアプリからできない。ブラウザで手続き"></textarea></label>
         <label class="publish-box" id="publishWrap" hidden>
@@ -730,11 +732,6 @@ dialog > form, dialog > .dlg-inner { display: contents; }
           <small>一覧にないサービスを、ほかの人も選べるようにします。公開するのは<strong>名前・カテゴリ・金額・支払い周期</strong>だけ。支払日・支払い方法・メモは公開しません。</small>
         </label>
       </fieldset>
-      <datalist id="methodList">
-        <option value="クレジットカード"></option><option value="デビットカード"></option><option value="キャリア決済"></option>
-        <option value="PayPay"></option><option value="Apple ID（App Store）"></option><option value="Google Play"></option>
-        <option value="口座振替"></option><option value="コンビニ払い"></option><option value="親のカード"></option>
-      </datalist>
       <div class="links" id="editLinks"></div>
     </div>
     <div class="dlg-foot">
@@ -1757,6 +1754,16 @@ function fillSelects() {
   $('#fStatus').innerHTML = Object.entries(STATUS).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join('');
   $('#fUsage').innerHTML = [['', '未設定'], ...Object.entries(USAGE)].map(([k, v]) => `<button type="button" role="radio" data-usage="${k}" aria-checked="false">${v}</button>`).join('');
 }
+// 支払い方法の候補: 自分がよく使っているもの → よくある呼び名 の順
+const METHODS = ['クレジットカード', 'キャリア決済', 'PayPay', 'Apple ID（App Store）', 'Google Play', 'デビットカード', '口座振替', 'コンビニ払い', '親のカード'];
+function renderMethods() {
+  const cur = $('#fMethod').value.trim();
+  const counts = new Map();
+  for (const s of state.subs) if (!s.sample && s.method) counts.set(s.method, (counts.get(s.method) || 0) + 1);
+  const mine = [...counts.entries()].sort((a, b) => b[1] - a[1]).map(([m]) => m).slice(0, 4);
+  $('#methodChips').innerHTML = [...new Set([...mine, ...METHODS])].slice(0, 10)
+    .map(m => `<button type="button" class="chip" data-method="${esc(m)}" aria-pressed="${m === cur}">${esc(m)}</button>`).join('');
+}
 function setUsage(v) { ui.usage = v; for (const b of $('#fUsage').children) b.setAttribute('aria-checked', String(b.dataset.usage === v)); }
 function syncTrial() { $('#trialWrap').hidden = $('#fStatus').value !== 'trial'; }
 function openEdit(id, opts = {}) {
@@ -1779,6 +1786,7 @@ function openEdit(id, opts = {}) {
   $('#fStatus').value = s ? s.status : 'active';
   $('#fTrialEnd').value = s ? s.trialEnd : '';
   $('#fMethod').value = s ? s.method : '';
+  renderMethods();
   $('#fShare').value = s ? s.share : 1;
   $('#fNote').value = s ? s.note : '';
   setUsage(s ? s.usage : '');
@@ -1839,15 +1847,28 @@ function renderPicker() {
   const commBtn = c => `<button type="button" class="svc" data-comm="${esc(c.id)}">${mono(c.name, c.cat, true)}<span class="svc-text"><span class="svc-name">${esc(c.name)}</span><span class="svc-from"><span class="badge comm">みんな</span> ${commPrice(c)}・${nf0.format(c.adds)}人</span></span></button>`;
   const html = list.slice(0, cap).map(svcBtn).join('') + comm.map(commBtn).join('')
     + (list.length > cap ? `<button type="button" class="svc more" data-action="pick-more">ほかの ${list.length - cap} サービスも表示</button>` : '');
-  $('#pickList').innerHTML = html || `<p class="small muted" style="margin:4px">${empty}</p>`;
   const svc = ui.pick.svc && SVC.get(ui.pick.svc);
+  $('#pickList').innerHTML = svc ? svcBtn(svc) : html || `<p class="small muted" style="margin:4px">${empty}</p>`;
   const pp = $('#pickPlans');
   pp.hidden = !svc;
   if (svc) {
-    pp.innerHTML = `<div class="plans-head"><b>${esc(svc.name)} のプランを選択</b><span><span class="conf ${esc(svc.confidence)}">${CONF[svc.confidence] || ''}</span> <span class="muted small">${esc(svc.checked)} 確認</span></span></div>
-      ${svc.note ? `<div class="plan-note">${esc(svc.note)}</div>` : ''}
+    pp.innerHTML = `<div class="plans-head"><b>${esc(svc.name)} のプランを選択</b><button type="button" class="btn link small" data-action="pick-back">ほかのサービスを選ぶ</button></div>
+      <div class="plan-note"><span class="conf ${esc(svc.confidence)}">${CONF[svc.confidence] || ''}</span> <span class="muted small">${esc(svc.checked)} 確認</span>${svc.note ? `　${esc(svc.note)}` : ''}</div>
       ${svc.plans.map(p => { const m = pmeta(p); return `<button type="button" class="plan" data-plan="${esc(p.id)}"><span>${esc(p.name)}${m.seats ? `<span class="badge seats">最大${m.seats}人</span>` : ''}${m.cond ? `<span class="badge${isStu(p) ? ' stu' : ''}">${esc(m.cond)}</span>` : ''}${m.note ? `<br><span class="small muted">${esc(m.note)}</span>` : ''}</span><b>${planPrice(p)}${p.price ? '／' + parseCycle(p.c).per : ''}</b></button>`; }).join('')}`;
   }
+}
+// サービスを選ぶ・選び直す。押した項目が画面の同じ位置にとどまるように、スクロールを合わせる
+function pickService(anchorId, next) {
+  const body = editDlg.querySelector('.dlg-body');
+  const at = id => id && $(`#pickList [data-svc="${CSS.escape(id)}"]`);
+  const a = at(anchorId), before = a ? a.getBoundingClientRect().top : null;
+  ui.pick.svc = next;
+  renderPicker();
+  const b = at(anchorId);
+  if (b && before !== null) body.scrollTop += b.getBoundingClientRect().top - before;
+  const pp = $('#pickPlans'), br = body.getBoundingClientRect();
+  // プランがほとんど見えないときだけ、選んだサービスが上に来るところまで送る
+  if (b && !pp.hidden && pp.getBoundingClientRect().top > br.bottom - 120) body.scrollTop += b.getBoundingClientRect().top - br.top - 8;
 }
 function pickCommunity(id) {
   const c = online.community.find(x => x.id === id);
@@ -2298,6 +2319,7 @@ const actions = {
     copyText(APP_URL, 'リンクをコピーしました');
   },
   'pick-more': () => { ui.pick.more = true; renderPicker(); },
+  'pick-back': () => pickService(ui.pick.svc, null),
   'open-community': () => openEdit(null, { cat: 'community' }),
   'add-community': el => { openEdit(null); pickCommunity(el.dataset.cid); },
   'report-community': async () => {
@@ -2321,10 +2343,12 @@ document.addEventListener('click', e => {
   if (el && actions[el.dataset.action] && state) { e.preventDefault(); actions[el.dataset.action](el); return; }
   const chip = e.target.closest('[data-pickcat]');
   if (chip) { ui.pick.cat = chip.dataset.pickcat; ui.pick.more = false; renderPicker(); return; }
+  const mBtn = e.target.closest('[data-method]');
+  if (mBtn) { $('#fMethod').value = mBtn.dataset.method; renderMethods(); return; }
   const commBtn = e.target.closest('[data-comm]');
   if (commBtn) { pickCommunity(commBtn.dataset.comm); return; }
   const svcBtn = e.target.closest('[data-svc]');
-  if (svcBtn) { ui.pick.svc = ui.pick.svc === svcBtn.dataset.svc ? null : svcBtn.dataset.svc; renderPicker(); const pp = $('#pickPlans'); if (!pp.hidden) pp.scrollIntoView({ block: 'nearest' }); return; }
+  if (svcBtn) { pickService(svcBtn.dataset.svc, ui.pick.svc === svcBtn.dataset.svc ? null : svcBtn.dataset.svc); return; }
   const plan = e.target.closest('[data-plan]');
   if (plan && ui.pick.svc) { choosePlan(ui.pick.svc, plan.dataset.plan); return; }
   const sw = e.target.closest('[data-switch]');
@@ -2377,6 +2401,7 @@ if (window.visualViewport) {
 $('#fStatus').addEventListener('change', () => { syncTrial(); if ($('#fStatus').value === 'trial' && !$('#fTrialEnd').value) $('#fTrialEnd').value = $('#fAnchor').value; });
 $('#fTrialEnd').addEventListener('change', () => { if ($('#fStatus').value === 'trial' && isISO($('#fTrialEnd').value)) $('#fAnchor').value = $('#fTrialEnd').value; });
 for (const id of ['#fPrice', '#fCur', '#fCycle', '#fShare']) $(id).addEventListener('input', () => { if (!$('#compare').hidden) renderCompare(); });
+$('#fMethod').addEventListener('input', () => renderMethods());
 $('#pickQ').addEventListener('input', e => { ui.pick.q = e.target.value; ui.pick.svc = null; ui.pick.more = false; renderPicker(); });
 for (const id of ['#lq', '#lf', '#ls']) $(id).addEventListener('input', () => state && renderList());
 $('#sBudget').addEventListener('change', e => commit(() => { state.settings.budget = Math.max(0, Math.round(Number(e.target.value) || 0)); state.settings.sampleBudget = false; touchSettings(); }));
