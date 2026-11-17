@@ -1120,12 +1120,15 @@ const FB_PATH = FB_ON ? `projects/${FB.projectId}/databases/(default)/documents`
 const FB_URL = FB_ON ? `${FB.base || 'https://firestore.googleapis.com'}/v1/${FB_PATH}` : '';
 const APP_URL = APP_CFG.appUrl || (/^https?:$/.test(location.protocol) ? location.origin + location.pathname : '');
 const ONLINE_KEY = 'subsc-tsucho/online';
+// みんなのサブスクと人気の読み込みは2時間に1回まで（Firestore の無料枠は「読んだ件数」で数えるため）
+const ONLINE_TTL = 2 * 3600 * 1000;
 const online = { community: [], popularity: {}, state: FB_ON ? 'loading' : 'off', at: 0, busy: false, transfer: null, transferBusy: false };
 if (FB_ON) {
   try {
     const c = JSON.parse(localStorage.getItem(ONLINE_KEY) || 'null');
     if (c && Array.isArray(c.community)) online.community = c.community;
     if (c && c.popularity && typeof c.popularity === 'object') online.popularity = c.popularity;
+    if (c && Number(c.at) > 0 && Number(c.at) <= now()) { online.at = Number(c.at); online.state = 'ok'; }
   } catch {}
 }
 const fv = v => typeof v === 'string' ? { stringValue: v } : Number.isInteger(v) ? { integerValue: String(v) } : { doubleValue: Number(v) };
@@ -1148,16 +1151,16 @@ const fbCommit = writes => fb(':commit', 'POST', { writes });
 const incWrite = (path, field) => ({ transform: { document: `${FB_PATH}/${path}`, fieldTransforms: [{ fieldPath: field, increment: { integerValue: '1' } }] } });
 const fbIncrement = (path, field) => fbCommit([incWrite(path, field)]);
 async function loadOnline() {
-  if (!FB_ON || online.busy) return;
+  if (!FB_ON || online.busy || now() - online.at < ONLINE_TTL) return;
   online.busy = true;
   try {
-    const [com, pop] = await Promise.all([fb('/community?pageSize=300&orderBy=adds%20desc'), fb('/popularity?pageSize=300')]);
+    const [com, pop] = await Promise.all([fb('/community?pageSize=100&orderBy=adds%20desc'), fb('/popularity?pageSize=200')]);
     online.community = ((com && com.documents) || []).map(unDoc)
       .filter(x => typeof x.name === 'string' && x.name.trim() && (Number(x.reports) || 0) < 3 && CAT_NAME[x.cat] && CYC[x.cycle] && Number(x.price) >= 0)
       .map(x => ({ id: x.id, name: x.name.slice(0, 60), cat: x.cat, price: Number(x.price), currency: x.currency === 'USD' ? 'USD' : 'JPY', cycle: x.cycle, adds: Number(x.adds) || 0 }));
     online.popularity = Object.fromEntries(((pop && pop.documents) || []).map(unDoc).filter(x => SVC.has(x.id)).map(x => [x.id, Number(x.count) || 0]));
     online.state = 'ok'; online.at = now();
-    try { localStorage.setItem(ONLINE_KEY, JSON.stringify({ community: online.community, popularity: online.popularity })); } catch {}
+    try { localStorage.setItem(ONLINE_KEY, JSON.stringify({ at: online.at, community: online.community, popularity: online.popularity })); } catch {}
   } catch { online.state = online.community.length || Object.keys(online.popularity).length ? 'stale' : 'error'; }
   online.busy = false;
   if (state) render();
@@ -1842,7 +1845,7 @@ function openEdit(id, opts = {}) {
   const del = $('#btnDelete'); del.hidden = !s; del.textContent = '削除'; del.classList.remove('danger');
   renderPicker(); renderPicked(); renderCompare(); renderEditLinks();
   showDlg(editDlg);
-  if (FB_ON && now() - online.at > 10 * 60 * 1000) loadOnline();
+  loadOnline();
   if (opts.compare && !$('#compare').hidden) setTimeout(() => $('#compare').scrollIntoView({ block: 'start', behavior: 'smooth' }), 60);
   else if (!s && !opts.svc && finePointer()) setTimeout(() => $('#pickQ').focus(), 30);
 }
