@@ -494,7 +494,6 @@ dialog > form, dialog > .dlg-inner { display: contents; }
     </div>
     <div class="top-actions">
       <button class="icon-btn" id="btnHide" data-action="toggle-hide" aria-pressed="false" aria-label="金額を隠す" title="金額を隠す"></button>
-      <button class="icon-btn" id="btnLock" data-action="lock-now" aria-label="今すぐロック" title="今すぐロック" hidden></button>
       <button class="btn primary add-top" data-action="add">＋ 追加</button>
     </div>
   </div>
@@ -602,7 +601,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
               <button class="btn primary" type="submit">引き継ぐ</button>
               <p class="err" role="alert" hidden></p>
             </form>
-            <p class="small muted">この画面にあるデータは消えず、引き継いだ分と合わせて残ります。パスコードは引き継がれないので、必要ならこの画面で設定し直してください。</p>
+            <p class="small muted">この画面にあるデータは消えず、引き継いだ分と合わせて残ります。</p>
           </div>
         </div>
         <details class="catalog manual" id="manualTransfer">
@@ -618,19 +617,6 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         <label class="switch"><input type="checkbox" id="sStudent"> 学生です（学割・学生無料の案を出す）</label>
         <div class="inline-field"><label for="sGrad">卒業予定</label><input id="sGrad" type="month" min="2024-01" max="2040-12"></div>
         <p class="small muted" id="gradInfo"></p>
-      </div>
-      <div class="card">
-        <h2>パスコード</h2>
-        <p>この端末に保存するデータに鍵をかけます。設定しなくても使えます。</p>
-        <ul class="privacy-list">
-          <li><b>守れるもの</b>：このブラウザに保存したサブスクの一覧と設定。パスコードから作った鍵で暗号化（AES-256）するので、スマホを人に貸したときなどに中身を見られません。</li>
-          <li><b>開くたびに求める</b>：オンにすると、アプリを開くたびに入力します。オフなら、この端末では入力を省けます。</li>
-          <li><b>忘れたら元に戻せません</b>：パスコードはどこにも送らず、アプリの作者も知らないため、再発行できません。設定する前にバックアップを書き出しておくと安心です。</li>
-          <li>書き出したバックアップも同じパスコードで暗号化されます（引き継ぎコードとは別のものです）。</li>
-        </ul>
-        <div id="lockStatus"></div>
-        <div id="lockOptions"></div>
-        <div class="btn-row" id="lockButtons"></div>
       </div>
       <div class="card">
         <h2>計算の設定</h2>
@@ -789,13 +775,13 @@ dialog > form, dialog > .dlg-inner { display: contents; }
 <div class="lock" id="lockScreen" hidden>
   <form class="lock-card" id="lockForm">
     <div class="brand"><span class="seal" aria-hidden="true">通</span><h1>サブスク通帳</h1></div>
-    <p style="margin:0;color:var(--ink-2);font-size:14px">この端末のデータには、パスコードで鍵がかかっています。</p>
+    <p style="margin:0;color:var(--ink-2);font-size:14px">パスコード機能は終わりました。最後に一度だけパスコードを入力すると鍵が外れ、次からはそのまま開けます。</p>
     <label class="f"><span>パスコード</span><input id="lockPass" type="password" autocomplete="current-password" required></label>
     <div class="err" id="lockErr" role="alert" hidden></div>
     <button class="btn primary" type="submit" id="lockSubmit">開く</button>
     <button class="btn link" type="button" id="lockForgot" style="justify-self:start;font-size:13px">パスコードを忘れた場合</button>
     <div id="lockForgotBox" hidden>
-      <p style="margin:0 0 8px;font-size:13px;color:var(--ink-2)">パスコードはどこにも保存されていないため、再発行できません。バックアップファイルがあれば、消去したあとに読み込めます。</p>
+      <p style="margin:0 0 8px;font-size:13px;color:var(--ink-2)">iPhone で自動作成したパスコードは、「パスワード」アプリ（または 設定 →［パスワード］）で「jinbb-shark」と検索すると見つかることがあります。見つからない場合、このデータは取り出せません。バックアップファイルや、ほかのブラウザに同じデータがあれば、消去したあとに読み込めます。</p>
       <button class="btn danger" type="button" id="lockWipe">この端末のデータを消去して最初から</button>
     </div>
   </form>
@@ -896,12 +882,12 @@ const mono = (name, cat, sm = false) => `<span class="mono-badge${sm ? ' sm' : '
 
 /* ───────── 端末ごとの設定（引き継がない） ───────── */
 const device = (() => {
-  const base = { hideAmounts: false, lockOnOpen: null };
+  const base = { hideAmounts: false };
   let d = base;
   try { d = Object.assign(base, JSON.parse(localStorage.getItem(DEVICE_KEY) || '{}')); } catch {}
-  // 以前の同期機能の設定（GitHub のトークンなど）は使わなくなったので、端末から消しておく
-  if ('sync' in d || 'gistToken' in d || 'gistId' in d) {
-    delete d.sync; delete d.gistToken; delete d.gistId;
+  // 以前の同期機能・パスコード機能の設定（GitHub のトークンなど）は使わなくなったので、端末から消しておく
+  if ('sync' in d || 'gistToken' in d || 'gistId' in d || 'lockOnOpen' in d) {
+    delete d.sync; delete d.gistToken; delete d.gistId; delete d.lockOnOpen;
     try { localStorage.setItem(DEVICE_KEY, JSON.stringify(d)); } catch {}
   }
   return d;
@@ -910,8 +896,7 @@ function saveDevice() { try { localStorage.setItem(DEVICE_KEY, JSON.stringify(de
 
 /* ───────── 状態 ───────── */
 let state = null;           // { v, subs, tomb, settings }
-let session = null;         // パスコード有効時 { key, salt, iter }
-let pendingEnc = null;      // ロック中の暗号化データ
+let pendingEnc = null;      // 以前のパスコード機能で暗号化されたままのデータ（最後に一度だけ開く）
 const ui = { tab: 'overview', cal: null, editId: null, editRef: null, editCid: '', usage: '', pick: { cat: 'all', q: '', svc: null, more: false }, delArmed: false };
 
 function defaultSettings() {
@@ -1003,12 +988,6 @@ async function deriveKey(pass, salt, iter) {
   const base = await crypto.subtle.importKey('raw', te.encode(pass), 'PBKDF2', false, ['deriveKey']);
   return crypto.subtle.deriveKey({ name: 'PBKDF2', salt, iterations: iter, hash: 'SHA-256' }, base, { name: 'AES-GCM', length: 256 }, false, ['encrypt', 'decrypt']);
 }
-async function newSession(pass) { const salt = crypto.getRandomValues(new Uint8Array(16)); return { key: await deriveKey(pass, salt, ITER), salt, iter: ITER }; }
-async function seal(data, sess) {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const ct = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, sess.key, te.encode(JSON.stringify(data)));
-  return { enc: true, v: 1, kdf: 'PBKDF2-SHA256', iter: sess.iter, salt: b64(sess.salt), iv: b64(iv), ct: b64(ct) };
-}
 async function openWithKey(obj, key) {
   const pt = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: unb64(obj.iv) }, key, unb64(obj.ct));
   return JSON.parse(td.decode(pt));
@@ -1023,7 +1002,7 @@ function readRaw() { try { return localStorage.getItem(STORE_KEY); } catch { ret
 function writeRaw(s) { try { localStorage.setItem(STORE_KEY, s); return true; } catch { return false; } }
 function removeRaw() { try { localStorage.removeItem(STORE_KEY); } catch {} }
 
-// パスコードから作った鍵は「取り出し不可」のまま IndexedDB に置けるので、端末に記憶しても鍵の中身は読めない
+// 以前のパスコード機能で「端末に記憶」した鍵（取り出し不可のまま IndexedDB にある）を、最後に一度だけ使う
 function idbOpen() {
   return new Promise((res, rej) => {
     const r = indexedDB.open('subsc-tsucho', 1);
@@ -1041,20 +1020,14 @@ async function idbDo(mode, fn) {
   } catch { return null; }
 }
 const idbGet = k => idbDo('readonly', st => st.get(k));
-const idbPut = (k, v) => idbDo('readwrite', st => st.put(v, k));
 const idbDel = k => idbDo('readwrite', st => st.delete(k));
-async function rememberKey() {
-  if (session && device.lockOnOpen === false) await idbPut('main', { key: session.key, salt: b64(session.salt), iter: session.iter });
-  else await idbDel('main');
-}
 
 let saveChain = Promise.resolve();
 let warnedStorage = false;
 function queueSave() {
   const snapshot = JSON.parse(JSON.stringify(state));
-  const sess = session;
   saveChain = saveChain.then(async () => {
-    const payload = sess ? await seal(snapshot, sess) : { enc: false, v: 2, data: snapshot };
+    const payload = { enc: false, v: 2, data: snapshot };
     if (!writeRaw(JSON.stringify(payload)) && !warnedStorage) {
       warnedStorage = true;
       toast('このブラウザでは保存できませんでした。閉じる前にバックアップを書き出してください', 'crit');
@@ -1411,8 +1384,7 @@ function render() {
   hb.innerHTML = device.hideAmounts ? ICON.eyeOff : ICON.eye;
   hb.setAttribute('aria-pressed', String(device.hideAmounts));
   hb.title = device.hideAmounts ? '金額を表示する' : '金額を隠す';
-  const lb = $('#btnLock'); lb.hidden = !(session && device.lockOnOpen); lb.innerHTML = ICON.lock;
-  $('#privacyBadge').innerHTML = session ? ICON.lock + '暗号化してこの端末に保存' : ICON.device + 'この端末のブラウザだけに保存';
+  $('#privacyBadge').innerHTML = ICON.device + 'この端末のブラウザだけに保存';
   renderOverview();
   renderPopular();
   renderList();
@@ -1707,15 +1679,7 @@ function renderSettings() {
   $('#gradInfo').innerHTML = !st.student ? '学割や学生無料の案は表示しません。'
     : gi.items.length ? `いま学割で使っている ${gi.items.length}件は、卒業後に月 <b>+${yen(gi.total)}</b> になる見込みです（${gi.items.map(x => esc(x.s.name)).join('、')}）。卒業の3か月前からお知らせします。`
     : '卒業すると学割が終わります。学割のプランを登録すると、卒業後に増える額を試算します。';
-  // パスコード
-  $('#lockStatus').innerHTML = session
-    ? `<span class="status-line on">${ICON.lock}設定済み（暗号化して保存）</span>`
-    : `<span class="status-line">${ICON.device}未設定</span>`;
-  $('#lockOptions').innerHTML = session ? `<label class="switch"><input type="checkbox" id="sLockOpen"${device.lockOnOpen ? ' checked' : ''}> 開くたびにパスコードを求める（この端末）</label>` : '';
-  $('#lockButtons').innerHTML = !cryptoOK ? '<p class="small muted">このブラウザでは暗号化機能を使えません。</p>'
-    : session ? `${device.lockOnOpen ? '<button class="btn" data-action="lock-now">今すぐロック</button>' : ''}<button class="btn" data-action="set-lock">パスコードを変更</button><button class="btn danger-ghost" data-action="remove-lock">パスコードをやめる</button>`
-    : '<button class="btn primary" data-action="set-lock">パスコードを設定する</button>';
-  $('#backupInfo').innerHTML = (st.lastBackup ? `最後に書き出した日: <b>${esc(st.lastBackup)}</b>。` : 'まだ書き出していません。') + (session ? 'パスコード設定中は、バックアップも同じパスコードで暗号化します。' : '');
+  $('#backupInfo').innerHTML = (st.lastBackup ? `最後に書き出した日: <b>${esc(st.lastBackup)}</b>。` : 'まだ書き出していません。');
   setVal($('#sBudget'), st.budget || '');
   setVal($('#sFx'), fxUSD());
   $('#sHide').checked = !!device.hideAmounts;
@@ -2079,9 +2043,7 @@ async function offerFile(filename, data, textFallback) {
   return false;
 }
 async function backupPayload() {
-  return session
-    ? Object.assign({ app: 'subsc-tsucho', exportedAt: new Date().toISOString() }, await seal(state, session))
-    : { app: 'subsc-tsucho', v: 2, exportedAt: new Date().toISOString(), enc: false, data: state };
+  return { app: 'subsc-tsucho', v: 2, exportedAt: new Date().toISOString(), enc: false, data: state };
 }
 function showText(title, desc, text) {
   $('#textTitle').textContent = title;
@@ -2186,20 +2148,20 @@ async function importFile(file) {
   await importObject(obj, 'replace');
 }
 async function importObject(obj, how) {
-  let data = null, sess = null;
+  let data = null;
   if (obj && obj.enc === true) {
     if (!cryptoOK) { toast('このブラウザでは暗号化されたデータを開けません', 'crit'); return false; }
-    const pass = await ask({ title: 'パスコードを入力', body: 'このデータはパスコードで暗号化されています。元の画面で使っているパスコードを入力してください。', ok: '開く', pass: 1 });
+    const pass = await ask({ title: 'パスコードを入力', body: '以前のパスコード機能で暗号化されたデータです。そのときのパスコードを入力してください。読み込んだあとは、パスコードなしで保存します。', ok: '開く', pass: 1 });
     if (!pass) return false;
-    try { ({ data, sess } = await unseal(obj, pass)); } catch { toast('パスコードが違うか、データが壊れています', 'crit'); return false; }
+    try { ({ data } = await unseal(obj, pass)); } catch { toast('パスコードが違うか、データが壊れています', 'crit'); return false; }
   } else if (obj && obj.data && Array.isArray(obj.data.subs)) data = obj.data;
   else { toast('サブスク通帳のデータではないようです', 'crit'); return false; }
   const next = normalize(data);
   next.subs = next.subs.filter(s => !s.sample);
-  return applyImport(next, how, sess);
+  return applyImport(next, how);
 }
 // how: 'replace' = いまのデータを置き換える（バックアップ） / 'merge' = 合わせる（引き継ぎ・貼り付け）
-async function applyImport(next, how, sess) {
+async function applyImport(next, how) {
   const hasMine = state.subs.some(s => !s.sample);
   const transfer = how === 'merge', merge = transfer && hasMine;
   const okd = await ask({
@@ -2208,7 +2170,6 @@ async function applyImport(next, how, sess) {
     ok: transfer ? '引き継ぐ' : '読み込む', danger: !merge && hasMine
   });
   if (!okd) return false;
-  if (sess && !session) session = sess;
   const t = now();
   for (const s of next.subs) s.updatedAt = Math.max(s.updatedAt || 0, t);
   commit(() => { state = merge ? mergeStates(state, next) : next; });
@@ -2231,12 +2192,13 @@ $('#lockForm').addEventListener('submit', async e => {
   const pass = $('#lockPass').value;
   const btn = $('#lockSubmit'); btn.disabled = true; btn.textContent = '確認中…';
   try {
-    const { data, sess } = await unseal(pendingEnc, pass);
-    session = sess; state = normalize(data); pendingEnc = null;
-    if (device.lockOnOpen === null) { device.lockOnOpen = true; saveDevice(); }
+    const { data } = await unseal(pendingEnc, pass);
+    state = normalize(data); pendingEnc = null;
+    await dropLock();
     lockScreen.hidden = true;
     render();
     rankCatchUp();
+    toast('鍵を外しました。次からはパスコードなしで開けます');
   } catch {
     $('#lockErr').textContent = 'パスコードが違います。';
     $('#lockErr').hidden = false;
@@ -2247,17 +2209,13 @@ $('#lockWipe').addEventListener('click', async e => {
   const b = e.currentTarget;
   if (!b.dataset.armed) { b.dataset.armed = '1'; b.textContent = 'もう一度押すと消去します（元に戻せません）'; return; }
   removeRaw(); await idbDel('main');
-  session = null; pendingEnc = null; device.lockOnOpen = null; saveDevice();
+  pendingEnc = null;
   state = normalize({}); lockScreen.hidden = true; render(); toast('この端末のデータを消去しました');
 });
-async function lockNow() {
-  if (!session) return;
-  await saveChain;
-  let raw = null;
-  try { raw = JSON.parse(readRaw()); } catch {}
-  if (!raw || !raw.enc) { toast('ロックできませんでした（保存に失敗しています）', 'crit'); return; }
-  pendingEnc = raw; session = null; state = null;
-  showLock();
+// パスコード機能は終了: 開けたデータは暗号化せずに保存し直し、端末に記憶していた鍵も消す
+async function dropLock() {
+  await idbDel('main');
+  await queueSave();
 }
 
 /* ───────── 操作 ───────── */
@@ -2302,22 +2260,6 @@ const actions = {
   'export-ics': () => exportICS(),
   'import-json': () => $('#importFile').click(),
   'fx-reset': () => commit(() => { state.settings.fxUSD = null; touchSettings(); }),
-  'set-lock': async () => {
-    const pass = await ask({ title: session ? '新しいパスコード' : 'パスコードを設定', body: '忘れると、このブラウザのデータを取り出せなくなります（再発行はできません）。先にバックアップを書き出しておくと安心です。', ok: '設定する', pass: 2 });
-    if (!pass) return;
-    const first = !session;
-    session = await newSession(pass);
-    if (first && device.lockOnOpen === null) device.lockOnOpen = true;
-    saveDevice();
-    await rememberKey();
-    commit(() => {});
-    toast('パスコードを設定しました');
-  },
-  'remove-lock': async () => {
-    if (!(await ask({ title: 'パスコードをやめますか？', body: 'この端末に保存するデータの暗号化をやめ、パスコードなしで開けるようにします。', ok: 'やめる', danger: true }))) return;
-    session = null; device.lockOnOpen = null; saveDevice(); await idbDel('main'); commit(() => {}); toast('パスコードをやめました');
-  },
-  'lock-now': () => lockNow(),
   'transfer-create': async () => {
     if (!state.subs.some(s => !s.sample)) { toast('引き継ぐサブスクがまだありません'); return; }
     online.transferBusy = true; renderTransfer();
@@ -2335,7 +2277,7 @@ const actions = {
   },
   'copy-data': () => {
     if (!state.subs.some(s => !s.sample)) { toast('コピーするサブスクがまだありません'); return; }
-    copyText(backupPayload().then(p => JSON.stringify(p)), session ? 'コピーしました（パスコードで暗号化済み）。移した先の画面で貼り付けてください' : 'コピーしました。移した先の画面で貼り付けてください');
+    copyText(backupPayload().then(p => JSON.stringify(p)), 'コピーしました。移した先の画面で貼り付けてください');
   },
   'paste-import': async () => {
     const box = $('#pasteBox'), text = box.value.trim();
@@ -2365,7 +2307,7 @@ const actions = {
   },
   'clear-all': async () => {
     if (!(await ask({ title: 'このブラウザのデータを削除しますか？', body: 'このブラウザに保存したサブスクと設定を消します。元に戻せません。', ok: '削除する', danger: true }))) return;
-    session = null; device.lockOnOpen = null; online.transfer = null; saveDevice(); await idbDel('main');
+    online.transfer = null; await idbDel('main');
     removeRaw(); state = normalize({}); render(); toast('このブラウザのデータを削除しました');
   }
 };
@@ -2395,7 +2337,6 @@ document.addEventListener('change', async e => {
     toast(on ? '人気ランキングに参加します' : '人気ランキングへの参加をやめました');
     return;
   }
-  if (e.target.id === 'sLockOpen') { device.lockOnOpen = e.target.checked; saveDevice(); await rememberKey(); render(); toast(device.lockOnOpen ? '次に開くときからパスコードを求めます' : 'この端末ではパスコードを記憶します'); }
 });
 $('#editForm').addEventListener('submit', e => { e.preventDefault(); saveEdit(); });
 document.addEventListener('submit', async e => {
@@ -2470,14 +2411,13 @@ async function boot() {
   let stored = null;
   try { const raw = readRaw(); stored = raw ? JSON.parse(raw) : null; } catch { stored = null; }
   if (stored && stored.enc === true && cryptoOK) {
-    if (device.lockOnOpen === null) { device.lockOnOpen = true; saveDevice(); }
-    if (device.lockOnOpen === false) {
-      const rec = await idbGet('main');
-      if (rec && rec.key && rec.salt === stored.salt) {
-        try { state = normalize(await openWithKey(stored, rec.key)); session = { key: rec.key, salt: unb64(rec.salt), iter: rec.iter || ITER }; } catch { state = null; }
-      }
+    // 以前のパスコード機能で暗号化されたデータ。端末に鍵を記憶していればそのまま開き、なければ最後に一度だけ入力してもらう
+    const rec = await idbGet('main');
+    if (rec && rec.key && rec.salt === stored.salt) {
+      try { state = normalize(await openWithKey(stored, rec.key)); } catch { state = null; }
     }
-    if (!state) { pendingEnc = stored; showLock(); }
+    if (state) await dropLock();
+    else { pendingEnc = stored; showLock(); }
   } else if (stored && stored.data) state = normalize(stored.data);
   else state = sampleState();
   if (state) { render(); rankCatchUp(); }
