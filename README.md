@@ -39,3 +39,12 @@
 6. `python build_site.py` を実行して、`app/config.js` と `docs/` をコミット・push
 
 `apiKey` は公開してよい値です。読み書きできる範囲は `firestore.rules` で制限しています。
+
+## 人気ランキングを止める・戻す
+
+`app/config.js` の `features.ranking` で切り替えます（いまは `false` で停止中）。
+
+- `false` … 数えない・読み込まない・表示しない（設定のカード、概要の「みんなの人気」、追加画面の「人気」タブ、プライバシー欄の該当行も隠れる）
+- `true` … 元どおり。Firebase に残っている数はそのまま使われ、止めていた間に追加された分は次に開いたときに数えられる
+
+書き換えたら `python build_site.py` を実行して、`app/config.js` と `docs/` をコミット・push します。

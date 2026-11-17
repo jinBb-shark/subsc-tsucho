@@ -11,5 +11,9 @@ window.SUBSC_CONFIG = {
   firebase: {
     apiKey: "AIzaSyD8gwQdzxVqVL7HGXqr-G5wMnZImDewPsk",
     projectId: "subsc-tsucho"
+  },
+  features: {
+    // 人気ランキング。false のあいだは数えず、表示もしません。true に戻すと、それまでのデータのまま復活します
+    ranking: false
   }
 };

@@ -539,7 +539,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
           <div class="card-head"><h2>カテゴリ別（ひと月あたり）</h2><span class="muted small">契約中のみ・自己負担額</span></div>
           <div class="bars" id="catBars"></div>
         </div>
-        <div class="card needs-online" id="popCard">
+        <div class="card needs-online needs-rank" id="popCard">
           <div class="card-head"><h2>みんなの人気</h2><span class="muted small">このアプリで追加した人の数</span></div>
           <ol class="pop-list" id="popList"></ol>
           <div class="btn-row"><button class="btn sm" data-action="open-community">みんなが追加したサブスクを見る</button></div>
@@ -640,7 +640,7 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         </div>
         <p class="small muted">カレンダー用ファイルは、支払日の前日に通知が出る予定を作ります。Googleカレンダーや iPhone のカレンダーに読み込めます（ZIP で保存された場合は展開してから）。</p>
       </div>
-      <div class="card needs-online">
+      <div class="card needs-online needs-rank">
         <h2>みんなのサブスク・人気ランキング</h2>
         <p>このアプリを使っている人の間でよく使われているサブスクを、「概要」と追加画面に表示します。</p>
         <label class="switch"><input type="checkbox" id="sRank"> 人気ランキングに参加する</label>
@@ -657,9 +657,9 @@ dialog > form, dialog > .dlg-inner { display: contents; }
         <ul class="privacy-list">
           <li>登録した内容（名前・金額・支払日・支払い方法・メモ）は、いま使っているブラウザの中にだけ保存されます。アカウント登録はありません。</li>
           <li class="no-online">ほかの場所には何も送信しません。</li>
-          <li class="needs-online">外に送るのは次の3つだけです。
+          <li class="needs-online">外に送るのは次の<span id="sendCount">3</span>つだけです。
             <ul>
-              <li>人気ランキングに参加しているとき：追加したサービスの種類</li>
+              <li class="needs-rank">人気ランキングに参加しているとき：追加したサービスの種類</li>
               <li>「みんなのサブスクに公開」を選んで保存したとき：そのサブスクの名前・カテゴリ・金額・支払い周期</li>
               <li>引き継ぎコードを発行したとき：コードで暗号化したデータ（24時間で期限切れ。受け取ると消えます）</li>
             </ul>
@@ -1068,6 +1068,8 @@ function mergeStates(a, b) {
 const APP_CFG = window.SUBSC_CONFIG || {};
 const FB = APP_CFG.firebase || {};
 const FB_ON = !!(FB.apiKey && FB.projectId && cryptoOK && window.fetch);
+// 人気ランキングは config.js の features.ranking で止められる（false のあいだは数えない・読まない・表示しない）
+const RANK_ON = FB_ON && (APP_CFG.features || {}).ranking !== false;
 const FB_PATH = FB_ON ? `projects/${FB.projectId}/databases/(default)/documents` : '';
 const FB_URL = FB_ON ? `${FB.base || 'https://firestore.googleapis.com'}/v1/${FB_PATH}` : '';
 const APP_URL = APP_CFG.appUrl || (/^https?:$/.test(location.protocol) ? location.origin + location.pathname : '');
@@ -1079,7 +1081,7 @@ if (FB_ON) {
   try {
     const c = JSON.parse(localStorage.getItem(ONLINE_KEY) || 'null');
     if (c && Array.isArray(c.community)) online.community = c.community;
-    if (c && c.popularity && typeof c.popularity === 'object') online.popularity = c.popularity;
+    if (RANK_ON && c && c.popularity && typeof c.popularity === 'object') online.popularity = c.popularity;
     if (c && Number(c.at) > 0 && Number(c.at) <= now()) { online.at = Number(c.at); online.state = 'ok'; }
   } catch {}
 }
@@ -1106,7 +1108,7 @@ async function loadOnline() {
   if (!FB_ON || online.busy || now() - online.at < ONLINE_TTL) return;
   online.busy = true;
   try {
-    const [com, pop] = await Promise.all([fb('/community?pageSize=100&orderBy=adds%20desc'), fb('/popularity?pageSize=200')]);
+    const [com, pop] = await Promise.all([fb('/community?pageSize=100&orderBy=adds%20desc'), RANK_ON ? fb('/popularity?pageSize=200') : null]);
     online.community = ((com && com.documents) || []).map(unDoc)
       .filter(x => typeof x.name === 'string' && x.name.trim() && (Number(x.reports) || 0) < 3 && CAT_NAME[x.cat] && CYC[x.cycle] && Number(x.price) >= 0)
       .map(x => ({ id: x.id, name: x.name.slice(0, 60), cat: x.cat, price: Number(x.price), currency: x.currency === 'USD' ? 'USD' : 'JPY', cycle: x.cycle, adds: Number(x.adds) || 0 }));
@@ -1122,7 +1124,7 @@ const markRanked = k => { const r = state.settings.ranked; if (!r.includes(k)) {
 // 人気ランキング: まだ数えていないサービスだけを、まとめて1つずつ数える（同じ人が何度追加しても1回）
 let rankBusy = false;
 function rankCatchUp() {
-  if (!FB_ON || !state || !state.settings.rank || rankBusy) return;
+  if (!RANK_ON || !state || !state.settings.rank || rankBusy) return;
   const done = new Set(state.settings.ranked);
   const ids = [...new Set(state.subs.filter(s => !s.sample && s.ref && SVC.has(s.ref.s)).map(s => s.ref.s))]
     .filter(id => !done.has('s:' + id) && /^[a-z0-9-]{1,40}$/.test(id));
@@ -1134,7 +1136,7 @@ function rankCatchUp() {
     .finally(() => { rankBusy = false; });
 }
 function countCommunity(cid) {
-  if (!FB_ON || !state.settings.rank || state.settings.ranked.includes('c:' + cid)) return;
+  if (!RANK_ON || !state.settings.rank || state.settings.ranked.includes('c:' + cid)) return;
   fbIncrement('community/' + cid, 'adds').then(() => {
     const c = online.community.find(x => x.id === cid); if (c) c.adds++;
     commit(() => markRanked('c:' + cid));
@@ -1649,7 +1651,7 @@ function onlineInfoText() {
   return `いま: みんなのサブスク ${online.community.length}件・ランキング ${n}サービス${online.state === 'stale' ? '（前回読み込んだ情報）' : ''}`;
 }
 function renderPopular() {
-  if (!FB_ON) return;
+  if (!RANK_ON) return;
   const mine = new Set();
   for (const s of state.subs) if (!s.sample && isLive(s)) { if (s.ref) mine.add('s:' + s.ref.s); if (s.cid) mine.add('c:' + s.cid); }
   const items = [
@@ -1812,7 +1814,8 @@ function renderPicker() {
   const pop = online.popularity, ranks = popRanks();
   $('#pickMeta').textContent = CATALOG.version ? `${CATALOG.services.length}サービス・${CATALOG.version} 時点の参考価格` : '';
   const chips = [{ id: 'all', name: 'すべて' }];
-  if (FB_ON) chips.push({ id: 'popular', name: '人気' }, { id: 'community', name: 'みんなの追加' });
+  if (RANK_ON) chips.push({ id: 'popular', name: '人気' });
+  if (FB_ON) chips.push({ id: 'community', name: 'みんなの追加' });
   chips.push(...CATS.filter(c => used.has(c.id)));
   $('#pickCats').innerHTML = chips.map(c => `<button type="button" class="chip" data-pickcat="${c.id}" aria-pressed="${c.id === cat}">${esc(c.name)}</button>`).join('');
   const hit = s => !q || normQ(s.name + ' ' + (s.kana || '')).includes(q);
@@ -2402,6 +2405,8 @@ async function boot() {
   fillSelects();
   for (const el of document.querySelectorAll('.needs-online')) el.hidden = !FB_ON;
   for (const el of document.querySelectorAll('.no-online')) el.hidden = FB_ON;
+  for (const el of document.querySelectorAll('.needs-rank')) el.hidden = !RANK_ON;
+  $('#sendCount').textContent = RANK_ON ? '3' : '2';
   if (!FB_ON) $('#manualTransfer').open = true;
   let startTab = 'overview';
   try { startTab = localStorage.getItem(TAB_KEY) || startTab; } catch {}
